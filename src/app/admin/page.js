@@ -21,6 +21,7 @@ export default function AdminPage() {
   const [reviews, setReviews] = useState([]);
   const [toastMessage, setToastMessage] = useState("");
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   const CORRECT_PASSCODE = "fajribtm123";
 
@@ -106,22 +107,27 @@ export default function AdminPage() {
     showToast("Link ulasan berhasil disalin ke clipboard!");
   };
 
-  const handleDeleteReview = async (id) => {
-    if (confirm("Apakah Anda yakin ingin menghapus ulasan ini dari database Supabase secara permanen?")) {
-      try {
-        const { error } = await supabase
-          .from("reviews")
-          .delete()
-          .eq("id", id);
+  const handleDeleteReview = (id) => {
+    setDeleteConfirmId(id);
+  };
 
-        if (error) throw error;
+  const confirmDeleteReview = async () => {
+    if (deleteConfirmId === null) return;
+    const id = deleteConfirmId;
+    setDeleteConfirmId(null);
+    try {
+      const { error } = await supabase
+        .from("reviews")
+        .delete()
+        .eq("id", id);
 
-        setReviews((prev) => prev.filter((rev) => rev.id !== id));
-        showToast("Ulasan berhasil dihapus dari database.");
-      } catch (err) {
-        console.error("Gagal menghapus ulasan:", err);
-        showToast("Gagal menghapus ulasan dari database.");
-      }
+      if (error) throw error;
+
+      setReviews((prev) => prev.filter((rev) => rev.id !== id));
+      showToast("Ulasan berhasil dihapus dari database.");
+    } catch (err) {
+      console.error("Gagal menghapus ulasan:", err);
+      showToast("Gagal menghapus ulasan dari database.");
     }
   };
 
@@ -383,6 +389,39 @@ export default function AdminPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
           </svg>
           <span className="text-xs font-bold">{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-205">
+          <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-500 mx-auto mb-4">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </div>
+            
+            <h3 className="text-base font-extrabold text-slate-800 text-center mb-2">Konfirmasi Hapus</h3>
+            <p className="text-xs text-slate-500 text-center leading-relaxed mb-6">
+              Apakah Anda yakin ingin menghapus ulasan ini secara permanen dari database Supabase? Tindakan ini tidak dapat dibatalkan.
+            </p>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-650 hover:bg-slate-50 transition-all cursor-pointer active:scale-95 text-slate-700 bg-slate-100 hover:bg-slate-200"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmDeleteReview}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-xs font-bold text-white transition-all shadow-md shadow-red-500/10 cursor-pointer active:scale-95"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

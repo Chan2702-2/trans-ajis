@@ -43,3 +43,18 @@ CREATE POLICY "Allow all access to magic_links"
 ON public.magic_links FOR ALL
 USING (true)
 WITH CHECK (true);
+
+-- 3. Membuat Bucket Storage untuk Foto Ulasan (reviews)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('reviews', 'reviews', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Kebijakan Akses Storage untuk semua orang (membaca objek)
+CREATE POLICY "Allow public read access to reviews bucket"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'reviews');
+
+-- Kebijakan Akses Storage untuk anonim (mengunggah objek)
+CREATE POLICY "Allow public insert access to reviews bucket"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'reviews');

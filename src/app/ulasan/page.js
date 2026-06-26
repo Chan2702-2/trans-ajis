@@ -38,7 +38,7 @@ export default function UlasanPage() {
           setReviews([]);
         }
       } catch (err) {
-        console.error("Gagal memuat ulasan dari Supabase:", err);
+        console.error("Gagal memuat ulasan:", err);
         setReviews([]);
       } finally {
         setIsLoading(false);
@@ -140,7 +140,7 @@ export default function UlasanPage() {
         {isLoading ? (
           <div className="text-center py-16">
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-            <p className="text-xs font-semibold text-slate-500">Memuat ulasan dari Supabase...</p>
+            <p className="text-xs font-semibold text-slate-500">Memuat ulasan</p>
           </div>
         ) : filteredReviews.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -157,6 +157,7 @@ export default function UlasanPage() {
                           src={rev.photo}
                           alt={rev.name}
                           fill
+                          sizes="44px"
                           className="object-cover"
                         />
                       ) : (
@@ -194,6 +195,18 @@ export default function UlasanPage() {
                   <p className="text-xs md:text-sm text-slate-650 leading-relaxed italic">
                     "{rev.comment}"
                   </p>
+
+                  {rev.photo && (
+                    <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden mt-4 border border-slate-200/60 bg-slate-50 shrink-0 shadow-sm">
+                      <Image
+                        src={rev.photo}
+                        alt="Foto Ulasan Pelanggan"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 350px"
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

@@ -31,6 +31,7 @@ export default function Home() {
   const [newReviewComment, setNewReviewComment] = useState("");
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewPhoto, setNewReviewPhoto] = useState("");
+  const [newReviewPhotoBlob, setNewReviewPhotoBlob] = useState(null);
   const [activeToken, setActiveToken] = useState(null);
 
   // Setup Intersection Observer for Scroll Reveal
@@ -56,7 +57,7 @@ export default function Home() {
     return () => {
       elements.forEach((el) => observer.unobserve(el));
     };
-  }, [reviews]);
+  }, []);
 
   // Effect to handle Magic Review Link validation with Supabase
 
@@ -263,8 +264,8 @@ export default function Home() {
       const img = new window.Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 200;
-        const MAX_HEIGHT = 200;
+        const MAX_WIDTH = 1000;
+        const MAX_HEIGHT = 1000;
         let width = img.width;
         let height = img.height;
 
@@ -285,9 +286,15 @@ export default function Home() {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
-        setNewReviewPhoto(compressedBase64);
-        setPhotoUploading(false);
+        // Generate base64 preview as webp
+        const previewBase64 = canvas.toDataURL("image/webp", 0.8);
+        setNewReviewPhoto(previewBase64);
+
+        // Generate blob for uploading as webp
+        canvas.toBlob((blob) => {
+          setNewReviewPhotoBlob(blob);
+          setPhotoUploading(false);
+        }, "image/webp", 0.8);
       };
       img.src = event.target.result;
     };
@@ -304,6 +311,32 @@ export default function Home() {
     const payloadName = `${newReviewTitle} ${newReviewName}`;
 
     try {
+      setPhotoUploading(true);
+      let photoUrl = null;
+
+      if (newReviewPhotoBlob) {
+        const fileExt = "webp";
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("reviews")
+          .upload(fileName, newReviewPhotoBlob, {
+            contentType: "image/webp",
+            cacheControl: "3600",
+            upsert: false
+          });
+
+        if (uploadError) {
+          throw new Error("Gagal mengunggah foto ke storage: " + uploadError.message);
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("reviews")
+          .getPublicUrl(fileName);
+        
+        photoUrl = publicUrlData.publicUrl;
+      }
+
       // 1. Simpan ulasan ke tabel reviews di Supabase
       const { data: insertedData, error: insertError } = await supabase
         .from("reviews")
@@ -312,7 +345,7 @@ export default function Home() {
             name: payloadName,
             rating: newReviewRating,
             comment: newReviewComment,
-            photo: newReviewPhoto || null,
+            photo: photoUrl,
             package: newReviewPkg || null
           }
         ])
@@ -351,6 +384,7 @@ export default function Home() {
       setNewReviewComment("");
       setNewReviewRating(5);
       setNewReviewPhoto("");
+      setNewReviewPhotoBlob(null);
       setNewReviewPkg("Batam & Bintan 3D2N");
       setShowReviewModal(false);
       setActiveToken(null);
@@ -359,9 +393,11 @@ export default function Home() {
       setSearchError("Ulasan Anda berhasil disimpan. Terima kasih!");
       setTimeout(() => setSearchError(""), 4000);
     } catch (err) {
-      console.error("Gagal mengirim ulasan ke Supabase:", err);
+      console.error("Gagal mengirim ulasan:", err);
       setToastType("error");
-      setSearchError("Gagal mengirim ulasan ke database. Silakan coba kembali.");
+      setSearchError(err.message || "Gagal mengirim ulasan ke database. Silakan coba kembali.");
+    } finally {
+      setPhotoUploading(false);
     }
   };
 
@@ -1139,6 +1175,18 @@ export default function Home() {
                     <p className="text-xs md:text-sm text-slate-650 leading-relaxed italic">
                       "{rev.comment}"
                     </p>
+
+                    {rev.photo && (
+                      <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden mt-4 border border-slate-200/60 bg-slate-50 shrink-0 shadow-sm">
+                        <Image
+                          src={rev.photo}
+                          alt="Foto Ulasan Pelanggan"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 350px"
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1318,7 +1366,7 @@ export default function Home() {
                     </div>
                   )}
                 </div>
-                <p className="text-[9px] text-slate-400 font-medium mt-1">Foto akan dioptimalkan otomatis agar berukuran kecil (~30kb).</p>
+                <p className="text-[9px] text-slate-400 font-medium mt-1">Foto akan dioptimalkan otomatis agar berukuran kecil (~100kb - 200kb).</p>
               </div>
 
               {/* Submit button */}
