@@ -1094,20 +1094,29 @@ export default function Home() {
             <div className="space-y-4">
               <div className="grid grid-cols-12 gap-3">
                 <div className="col-span-4">
-                  <label htmlFor="search-title-select" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">
                     Sapaan
                   </label>
-                  <select
-                    id="search-title-select"
-                    value={searchUserTitle}
-                    onChange={(e) => setSearchUserTitle(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all cursor-pointer"
-                    required
-                  >
-                    <option value="Mr.">Mr.</option>
-                    <option value="Mrs.">Mrs.</option>
-                    <option value="Ms.">Ms.</option>
-                  </select>
+                  <div className="flex rounded-xl border border-slate-200 p-1 bg-slate-50 gap-1 h-[42px] items-center">
+                    {["Mr.", "Mrs.", "Ms."].map((t) => {
+                      const isActive = searchUserTitle === t;
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setSearchUserTitle(t)}
+                          className={`flex-1 text-center py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none
+                            ${isActive 
+                              ? "bg-blue-600 text-white shadow-sm" 
+                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                            }
+                          `}
+                        >
+                          {t.replace(".", "")}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="col-span-8">
                   <label htmlFor="search-name-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">

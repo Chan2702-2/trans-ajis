@@ -173,20 +173,29 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
         {/* Input Sapaan & Nama Lengkap */}
         <div className="grid grid-cols-12 gap-3">
           <div className="col-span-4">
-            <label htmlFor="title-select" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
               Sapaan
             </label>
-            <select
-              id="title-select"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all cursor-pointer"
-              required
-            >
-              <option value="Mr.">Mr.</option>
-              <option value="Mrs.">Mrs.</option>
-              <option value="Ms.">Ms.</option>
-            </select>
+            <div className="flex rounded-xl border border-slate-200 p-1 bg-slate-50 gap-1 h-[42px] items-center">
+              {["Mr.", "Mrs.", "Ms."].map((t) => {
+                const isActive = title === t;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTitle(t)}
+                    className={`flex-1 text-center py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none
+                      ${isActive 
+                        ? "bg-blue-600 text-white shadow-sm" 
+                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                      }
+                    `}
+                  >
+                    {t.replace(".", "")}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="col-span-8">
             <label htmlFor="name-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
