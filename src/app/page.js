@@ -1,11 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PACKAGES } from "@/constants/packages";
 import BookingForm from "@/components/BookingForm";
 
 export default function Home() {
+  // Setup Intersection Observer for Scroll Reveal
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("reveal-active");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    const elements = document.querySelectorAll(".reveal-on-scroll");
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      elements.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
+
   // State for Search Module
   const [searchDest, setSearchDest] = useState("");
   const [searchDate, setSearchDate] = useState("");
@@ -381,16 +406,16 @@ export default function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {/* Card 1: Batam & Bintan 3D2N */}
-            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div className="group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 reveal-on-scroll">
               <div>
-                <div className="relative aspect-[16/7] w-full bg-slate-100">
+                <div className="relative aspect-[16/7] w-full bg-slate-100 overflow-hidden">
                   <Image
                     src="/beach_resort_bintan.jpg"
                     alt="Batam & Bintan Resort"
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />
-                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
                     Promo: 10 pax FREE 1 orang
                   </div>
                 </div>
@@ -423,7 +448,7 @@ export default function Home() {
                         "2x Makan Siang Seafood di Restauran Kelong Premium",
                         "Air Mineral gratis selama perjalanan tour"
                       ].map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-slate-600">
+                        <li key={idx} className="flex items-start gap-2 text-xs text-slate-605">
                           <svg className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                           </svg>
@@ -449,16 +474,16 @@ export default function Home() {
             </div>
 
             {/* Card 2: Batam 2D1N */}
-            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div className="group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 reveal-on-scroll reveal-delay-100">
               <div>
-                <div className="relative aspect-[16/7] w-full bg-slate-100">
+                <div className="relative aspect-[16/7] w-full bg-slate-100 overflow-hidden">
                   <Image
                     src="/batam_temple_landmark.jpg"
                     alt="Batam Temple Landmark"
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />
-                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
                     Promo: 10 pax FREE 1 orang
                   </div>
                 </div>
@@ -516,16 +541,16 @@ export default function Home() {
             </div>
 
             {/* Card 3: Batam 3D2N (Essential) */}
-            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div className="group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 reveal-on-scroll reveal-delay-200">
               <div>
-                <div className="relative aspect-[16/7] w-full bg-slate-100">
+                <div className="relative aspect-[16/7] w-full bg-slate-100 overflow-hidden">
                   <Image
                     src="/batam_city_mall.jpg"
                     alt="Batam Shopping Mall"
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />
-                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
                     Promo: Group Bonus 10+
                   </div>
                 </div>
@@ -584,7 +609,7 @@ export default function Home() {
 
       {/* 6. Booking Calculator Section */}
       <section id="booking-section" className="py-20 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal-on-scroll">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold text-[#1A365D] tracking-tight">
               Kalkulator Instan & Pemesanan
@@ -611,34 +636,40 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-start gap-4 reveal-on-scroll">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25" />
                 </svg>
               </div>
-              <h4 className="text-base font-bold text-slate-800 mb-2">Armada Nyaman & Baru</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">Semua armada tour menggunakan model terbaru yang bersih, terawat, dan ber-AC dingin.</p>
+              <div>
+                <h4 className="text-base font-bold text-slate-800 mb-1">Armada Nyaman & Baru</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">Semua armada tour menggunakan model terbaru yang bersih, terawat, dan ber-AC dingin.</p>
+              </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-start gap-4 reveal-on-scroll reveal-delay-100">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
                 </svg>
               </div>
-              <h4 className="text-base font-bold text-slate-800 mb-2">Guide Lokal Berlisensi</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">Didampingi pemandu wisata lokal ramah yang mengerti sejarah, spot foto terbaik, dan kuliner khas.</p>
+              <div>
+                <h4 className="text-base font-bold text-slate-800 mb-1">Guide Lokal Berlisensi</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">Didampingi pemandu wisata lokal ramah yang mengerti sejarah, spot foto terbaik, dan kuliner khas.</p>
+              </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-start gap-4 reveal-on-scroll reveal-delay-200">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63" />
                 </svg>
               </div>
-              <h4 className="text-base font-bold text-slate-800 mb-2">Koordinasi Mulus</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">Admin responsif yang siap mengatur tiket ferry PP dan hotel untuk Anda tanpa repot.</p>
+              <div>
+                <h4 className="text-base font-bold text-slate-800 mb-1">Koordinasi Mulus</h4>
+                <p className="text-xs text-slate-500 leading-relaxed">Admin responsif yang siap mengatur tiket ferry PP dan hotel untuk Anda tanpa repot.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -654,70 +685,74 @@ export default function Home() {
             <p className="mt-3 text-sm text-slate-600 max-w-xl mx-auto">
               Punya pertanyaan atau butuh penyesuaian rute? Tim kami siap melayani Anda 24/7.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 max-w-6xl mx-auto">
-            {/* Info Cards Column */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
+          </div>          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 max-w-6xl mx-auto">
+            {/* Info Cards Column (spans 3 columns to make map smaller) */}
+            <div className="lg:col-span-3 flex flex-col gap-6">
               {/* WhatsApp */}
               <a 
                 href="https://wa.me/6281266648244" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-500/50 transition-all group"
+                className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-500/50 transition-all group flex items-start gap-4"
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                   <svg className="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.725 1.451 5.405.002 9.801-4.394 9.803-9.805.001-2.621-1.022-5.086-2.88-6.944C16.438 1.996 13.975 1.02 11.35 1.02c-5.41 0-9.808 4.397-9.81 9.811-.001 1.642.434 3.243 1.258 4.654l-.994 3.634 3.72-.976" />
                   </svg>
                 </div>
-                <h3 className="text-base font-bold text-slate-800 mb-1">WhatsApp</h3>
-                <p className="text-xs text-slate-500 mb-2">+62 812-6664-8244</p>
-                <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
-                  Chat Sekarang
-                  <svg className="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </span>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800 mb-1">WhatsApp</h3>
+                  <p className="text-xs text-slate-500 mb-2">+62 812-6664-8244</p>
+                  <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
+                    Chat Sekarang
+                    <svg className="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
+                </div>
               </a>
 
               {/* Email */}
               <a 
                 href="mailto:info@fajritransportbatam.com" 
-                className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-500/50 transition-all group"
+                className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-500/50 transition-all group flex items-start gap-4"
               >
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                   <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
                 </div>
-                <h3 className="text-base font-bold text-slate-800 mb-1">Email</h3>
-                <p className="text-xs text-slate-500 mb-2">info@fajritransportbatam.com</p>
-                <span className="text-[11px] font-semibold text-blue-600 flex items-center gap-1">
-                  Kirim Email
-                  <svg className="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </span>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800 mb-1">Email</h3>
+                  <p className="text-xs text-slate-500 mb-2">info@fajritransportbatam.com</p>
+                  <span className="text-[11px] font-semibold text-blue-600 flex items-center gap-1">
+                    Kirim Email
+                    <svg className="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
+                </div>
               </a>
 
               {/* Lokasi / Alamat */}
-              <div className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200">
-                <div className="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center mb-4">
-                  <svg className="w-6 h-6 text-rose-600" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+              <div className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
+                  <svg className="w-6 h-6 text-rose-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25C19.5 6.358 16.142 3 12 3c-4.142 0-7.5 3.358-7.5 7.5 0 7.142 7.5 11.25 7.5 11.25s7.5-4.108 7.5-11.25z" />
                   </svg>
                 </div>
-                <h3 className="text-base font-bold text-slate-800 mb-1">Lokasi Utama</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Batam, Kepulauan Riau, Indonesia
-                </p>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800 mb-1">Lokasi Utama</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Bengkong indah bawah blok e no 2 gang flamboyan, Batam, Kepulauan Riau, Indonesia
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Google Map Embed */}
-            <div className="lg:col-span-3 w-full h-[350px] lg:h-auto min-h-[350px] rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative bg-white">
+            {/* Google Map Embed (spans 2 columns to be smaller, with fixed height) */}
+            <div className="lg:col-span-2 w-full h-[280px] lg:h-[350px] rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative bg-white">
               <iframe
                 title="Lokasi Fajri Transport Batam"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.48419688467!2d103.9242964893113!3d1.0182470726223293!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d98bcee06f0e9f%3A0x3039d80b220cc70!2sBatam%2C%20Batam%20City%2C%20Riau%20Islands!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
@@ -754,36 +789,15 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* 7. Frosted Glass AI Bubble and Realistic Pen */}
-      <div className="fixed bottom-6 left-6 z-50 flex items-end gap-3 pointer-events-none">
-        {/* The Realistic Pen */}
-        <div className="relative w-4 h-36 origin-bottom rotate-[28deg] translate-x-4 translate-y-1 drop-shadow-[2px_8px_4px_rgba(0,0,0,0.15)] flex flex-col items-center">
-          {/* Pen Tip / Nib */}
-          <div className="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[10px] border-b-slate-400" />
-          {/* Pen Tip Collar */}
-          <div className="w-[8px] h-3 bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 rounded-t-sm" />
-          {/* Pen Body */}
-          <div className="w-[10px] h-20 bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 relative flex items-center justify-center">
-            {/* Laser etched brand text */}
-            <span className="text-[6px] text-yellow-400 font-extrabold tracking-widest uppercase rotate-90 whitespace-nowrap opacity-85 select-none">
-              FAJRI TRANSPORT BATAM
-            </span>
-          </div>
-          {/* Gold Accent Ring */}
-          <div className="w-[11px] h-1.5 bg-gradient-to-r from-yellow-500 to-yellow-600" />
-          {/* Pen Cap End */}
-          <div className="w-[10px] h-6 bg-slate-800 rounded-b-md" />
-          {/* Pen Clip */}
-          <div className="absolute top-12 -right-1.5 w-1 h-12 bg-slate-400 rounded-sm shadow-sm" />
-        </div>
-
+      {/* AI Customer / Assistant Bubble */}
+      <div className="fixed bottom-6 left-6 z-50 pointer-events-none">
         {/* AI Prompt Bubble */}
-        <div className="max-w-xs bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 shadow-lg pointer-events-auto flex flex-col gap-2">
+        <div className="max-w-xs bg-white/95 backdrop-blur-md p-4 rounded-2xl rounded-bl-none border border-slate-200/85 shadow-xl pointer-events-auto flex flex-col gap-2 animate-imessage-pop animation-delay-300 transition-all duration-300">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-blue-900/60 uppercase tracking-widest">AI Customizer</span>
+            <span className="text-[10px] font-bold text-blue-900/60 uppercase tracking-widest">Fajri Ajis</span>
           </div>
-          <p className="text-xs text-slate-700 leading-relaxed font-semibold italic">
+          <p className="text-xs text-slate-750 leading-relaxed font-semibold italic">
             "Ubah Paket 3 untuk menampilkan group bonus lengkap: 10+ (1 Free), 20+ (2 Free), 30+ (3 Free), dst."
           </p>
         </div>
