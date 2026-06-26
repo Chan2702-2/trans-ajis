@@ -13,6 +13,70 @@ export default function Home() {
   // State for Booking Form
   const [selectedPackageId, setSelectedPackageId] = useState("");
 
+  const getTodayDateString = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  const todayStr = getTodayDateString();
+
+  // Custom Modern Calendar states
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
+
+  const monthNames = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+  const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
+
+  const handlePrevMonth = () => {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11);
+      setCalendarYear((prev) => prev - 1);
+    } else {
+      setCalendarMonth((prev) => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (calendarMonth === 11) {
+      setCalendarMonth(0);
+      setCalendarYear((prev) => prev + 1);
+    } else {
+      setCalendarMonth((prev) => prev + 1);
+    }
+  };
+
+  const handleSelectDay = (day) => {
+    const formattedDate = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    setSearchDate(formattedDate);
+    setShowCalendar(false);
+  };
+
+  const isPastDate = (day) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateToCheck = new Date(calendarYear, calendarMonth, day);
+    return dateToCheck < today;
+  };
+
+  // Helper to format date for input display
+  const getFormattedSearchDate = () => {
+    if (!searchDate) return "Pilih Tanggal Keberangkatan";
+    const parts = searchDate.split("-");
+    const d = parseInt(parts[2]);
+    const m = parseInt(parts[1]) - 1;
+    const y = parts[0];
+    return `${d} ${monthNames[m]} ${y}`;
+  };
+
   const handleSelectPackage = (pkgId) => {
     setSelectedPackageId(pkgId);
     const formElement = document.getElementById("booking-section");
@@ -23,8 +87,8 @@ export default function Home() {
 
   // Helper to generate WA Link
   const handleWAFlow = (pkgName, details = "") => {
-    const adminPhone = "628117771234";
-    const baseMessage = `Halo Admin Ajis Batam Trans, saya tertarik dengan paket: ${pkgName}.`;
+    const adminPhone = "6281266648244";
+    const baseMessage = `Halo Admin Fajri Transport Batam, saya tertarik dengan paket: ${pkgName}.`;
     const finalMessage = details ? `${baseMessage} ${details}` : baseMessage;
     const encoded = encodeURIComponent(finalMessage);
     window.open(`https://wa.me/${adminPhone}?text=${encoded}`, "_blank");
@@ -56,13 +120,13 @@ export default function Home() {
             <div className="relative w-9 h-9 rounded-lg overflow-hidden shadow-sm border border-slate-200 bg-slate-50">
               <Image
                 src="/asset/img/logo-1.jpeg"
-                alt="Ajis Batam Trans Logo"
+                alt="Fajri Transport Batam Logo"
                 fill
                 className="object-cover"
               />
             </div>
             <span className="font-extrabold text-lg tracking-tight text-blue-900">
-              Ajis Batam Trans
+              Fajri Transport Batam
             </span>
           </div>
           
@@ -83,40 +147,66 @@ export default function Home() {
       </header>
 
       {/* 3. Hero Section */}
-      <section className="relative pt-16 pb-24 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1A365D] leading-tight max-w-3xl mx-auto">
-            Eksplorasi Keindahan Batam & Bintan Bersama Partner Terpercaya
-          </h1>
-          
-          <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-xl mx-auto leading-relaxed">
-            Penyedia layanan transportasi premium terlengkap dengan armada modern, hotel berbintang, dan pemandu lokal berlisensi.
-          </p>
+      <section 
+        className="relative py-20 md:py-28 bg-cover bg-center border-b border-slate-200"
+        style={{
+          backgroundImage: "url('/beach_resort_bintan.jpg')"
+        }}
+      >
+        {/* Dark overlay to ensure contrast and readability */}
+        <div className="absolute inset-0 bg-slate-900/35 backdrop-blur-[2px]" />
 
-          <div className="mt-6 flex justify-center gap-4">
-            <a
-              href="#packages"
-              className="inline-flex items-center text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors gap-1 group"
-            >
-              Lihat Pilihan Paket
-              <span className="transform group-hover:translate-x-1 transition-transform">→</span>
-            </a>
-          </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 md:p-10 shadow-2xl border border-slate-200/60">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Left Column: Text & CTA */}
+              <div className="lg:col-span-7 space-y-6 text-left">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold text-blue-700 border border-blue-100 shadow-sm">
+                  ⚡ Partner Transportasi & Tour Resmi Batam
+                </span>
+                <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#1A365D] leading-tight">
+                  Eksplorasi Keindahan Batam & Bintan Bersama Partner Terpercaya
+                </h1>
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
+                  Penyedia layanan transportasi premium terlengkap dengan armada modern, hotel berbintang, dan pemandu lokal berlisensi.
+                </p>
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <a
+                    href="#packages"
+                    className="inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm font-bold text-white px-6 py-3 transition-all shadow-md active:scale-95"
+                  >
+                    Lihat Pilihan Paket
+                  </a>
+                  <a
+                    href="#booking-section"
+                    className="inline-flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs sm:text-sm font-bold text-slate-700 px-6 py-3 transition-all active:scale-95"
+                  >
+                    Kalkulator Harga
+                  </a>
+                </div>
+              </div>
 
-          {/* Focused Vehicle Banner Card */}
-          <div className="mt-10 max-w-2xl mx-auto rounded-2xl overflow-hidden border border-slate-200 bg-blue-50/40 p-3 shadow-md">
-            <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-100">
-              <Image
-                src="/tour_van_batam.jpg"
-                alt="Armada Transportasi Modern"
-                fill
-                className="object-cover"
-                priority
-              />
+              {/* Right Column: Vehicle Card */}
+              <div className="lg:col-span-5 w-full">
+                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-blue-50/40 p-2.5 shadow-md">
+                  <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-100">
+                    <Image
+                      src="/tour_van_batam.jpg"
+                      alt="Armada Transportasi Modern"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-2 font-medium text-center">Armada Toyota Hiace Commuter premium kami</p>
+                </div>
+              </div>
+
             </div>
-            <p className="text-xs text-slate-500 mt-2.5 font-medium">Armada Toyota Hiace Commuter premium kami untuk kenyamanan maksimal Anda</p>
           </div>
         </div>
+      </section>
 
         {/* 4. Search / Booking Module */}
         <div className="max-w-4xl mx-auto px-4 mt-12 relative z-20">
@@ -145,18 +235,123 @@ export default function Home() {
                 </select>
               </div>
 
-              {/* Departure Date */}
-              <div className="flex flex-col">
-                <label htmlFor="date-input" className="text-xs font-bold text-blue-900/60 uppercase tracking-wider mb-1.5 pl-1">
+              {/* Custom Modern Departure Date Picker */}
+              <div className="flex flex-col relative">
+                <label className="text-xs font-bold text-blue-900/60 uppercase tracking-wider mb-1.5 pl-1">
                   Tanggal Keberangkatan
                 </label>
-                <input
-                  id="date-input"
-                  type="date"
-                  value={searchDate}
-                  onChange={(e) => setSearchDate(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all"
-                />
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowCalendar(!showCalendar)}
+                    className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 pl-4 pr-10 py-3 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all text-left"
+                  >
+                    <span>{getFormattedSearchDate()}</span>
+                    <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* Calendar Modal Popup */}
+                  {showCalendar && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                      {/* Backdrop overlay */}
+                      <div 
+                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                        onClick={() => setShowCalendar(false)}
+                      />
+                      
+                      {/* Modal Content */}
+                      <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-sm select-none animate-in fade-in zoom-in-95 duration-200">
+                        {/* Title & Close */}
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="text-sm font-extrabold text-[#1A365D]">Pilih Tanggal Keberangkatan</h4>
+                          <button
+                            type="button"
+                            onClick={() => setShowCalendar(false)}
+                            className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Calendar Header */}
+                        <div className="flex justify-between items-center mb-4 bg-slate-50 rounded-xl p-2">
+                          <button
+                            type="button"
+                            onClick={handlePrevMonth}
+                            className="w-8 h-8 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                            </svg>
+                          </button>
+                          <span className="text-sm font-bold text-blue-900">
+                            {monthNames[calendarMonth]} {calendarYear}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleNextMonth}
+                            className="w-8 h-8 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Calendar Weekdays */}
+                        <div className="grid grid-cols-7 gap-1.5 text-center mb-2">
+                          {dayNames.map((day) => (
+                            <span key={day} className="text-[10px] font-bold text-slate-400 uppercase">
+                              {day}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Calendar Days Grid */}
+                        <div className="grid grid-cols-7 gap-1.5 justify-items-center">
+                          {/* Day padding */}
+                          {Array.from({ length: firstDayIndex }).map((_, i) => (
+                            <div key={`pad-${i}`} className="w-8 h-8" />
+                          ))}
+                          
+                          {/* Days numbers */}
+                          {Array.from({ length: daysInMonth }).map((_, i) => {
+                            const day = i + 1;
+                            const past = isPastDate(day);
+                            const formattedToCheck = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const isSelected = searchDate === formattedToCheck;
+                            
+                            return (
+                              <button
+                                key={`day-${day}`}
+                                type="button"
+                                disabled={past}
+                                onClick={() => handleSelectDay(day)}
+                                className={`
+                                  h-8 w-8 text-xs font-semibold rounded-lg flex items-center justify-center transition-all
+                                  ${past 
+                                    ? "text-slate-200 cursor-not-allowed" 
+                                    : isSelected
+                                      ? "bg-blue-600 text-white font-bold shadow-md transform scale-110"
+                                      : "text-slate-700 hover:bg-slate-100 hover:scale-105"
+                                  }
+                                `}
+                              >
+                                {day}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -171,7 +366,6 @@ export default function Home() {
             </div>
           </form>
         </div>
-      </section>
 
       {/* 5. Paket Populer Section */}
       <section id="packages" className="py-20 border-t border-slate-200 bg-white/60 backdrop-blur-sm">
@@ -467,7 +661,7 @@ export default function Home() {
             <div className="lg:col-span-2 flex flex-col gap-6">
               {/* WhatsApp */}
               <a 
-                href="https://wa.me/628117771234" 
+                href="https://wa.me/6281266648244" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-500/50 transition-all group"
@@ -478,7 +672,7 @@ export default function Home() {
                   </svg>
                 </div>
                 <h3 className="text-base font-bold text-slate-800 mb-1">WhatsApp</h3>
-                <p className="text-xs text-slate-500 mb-2">+62 811-777-1234</p>
+                <p className="text-xs text-slate-500 mb-2">+62 812-6664-8244</p>
                 <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
                   Chat Sekarang
                   <svg className="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -489,7 +683,7 @@ export default function Home() {
 
               {/* Email */}
               <a 
-                href="mailto:info@ajisbatamtrans.com" 
+                href="mailto:info@fajritransportbatam.com" 
                 className="p-6 rounded-2xl bg-white shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-500/50 transition-all group"
               >
                 <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -498,7 +692,7 @@ export default function Home() {
                   </svg>
                 </div>
                 <h3 className="text-base font-bold text-slate-800 mb-1">Email</h3>
-                <p className="text-xs text-slate-500 mb-2">info@ajisbatamtrans.com</p>
+                <p className="text-xs text-slate-500 mb-2">info@fajritransportbatam.com</p>
                 <span className="text-[11px] font-semibold text-blue-600 flex items-center gap-1">
                   Kirim Email
                   <svg className="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -525,7 +719,7 @@ export default function Home() {
             {/* Google Map Embed */}
             <div className="lg:col-span-3 w-full h-[350px] lg:h-auto min-h-[350px] rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative bg-white">
               <iframe
-                title="Lokasi Ajis Batam Trans"
+                title="Lokasi Fajri Transport Batam"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.48419688467!2d103.9242964893113!3d1.0182470726223293!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d98bcee06f0e9f%3A0x3039d80b220cc70!2sBatam%2C%20Batam%20City%2C%20Riau%20Islands!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
                 className="w-full h-full border-0 absolute inset-0 opacity-90 hover:opacity-100 transition-opacity"
                 allowFullScreen=""
@@ -544,18 +738,18 @@ export default function Home() {
             <div className="relative w-7 h-7 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 shadow-sm">
               <Image
                 src="/asset/img/logo-1.jpeg"
-                alt="Ajis Batam Trans Logo"
+                alt="Fajri Transport Batam Logo"
                 fill
                 className="object-cover"
               />
             </div>
-            <span className="font-bold text-base tracking-tight">Ajis Batam Trans & Tour</span>
+            <span className="font-bold text-base tracking-tight">Fajri Transport Batam & Tour</span>
           </div>
           <p className="text-xs max-w-md mx-auto text-slate-500">
             Penyedia layanan transportasi, sewa mobil, dan paket tour terlengkap di Batam & Bintan dengan pelayanan bintang 5.
           </p>
           <div className="text-[10px] text-slate-600">
-            © {new Date().getFullYear()} Ajis Batam Trans. Hak Cipta Dilindungi Undang-Undang.
+            © {new Date().getFullYear()} Fajri Transport Batam. Hak Cipta Dilindungi Undang-Undang.
           </div>
         </div>
       </footer>
@@ -572,7 +766,7 @@ export default function Home() {
           <div className="w-[10px] h-20 bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 relative flex items-center justify-center">
             {/* Laser etched brand text */}
             <span className="text-[6px] text-yellow-400 font-extrabold tracking-widest uppercase rotate-90 whitespace-nowrap opacity-85 select-none">
-              AJIS BATAM TRANS
+              FAJRI TRANSPORT BATAM
             </span>
           </div>
           {/* Gold Accent Ring */}

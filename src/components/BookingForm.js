@@ -19,10 +19,10 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
   useEffect(() => {
     const pkg = PACKAGES.find((p) => p.id === selectedId);
     setClientSelectedPkg(pkg || null);
-    if (onPackageChange && pkg) {
+    if (onPackageChange && pkg && pkg.id !== selectedPackageId) {
       onPackageChange(pkg.id);
     }
-  }, [selectedId, onPackageChange]);
+  }, [selectedId, onPackageChange, selectedPackageId]);
 
   // Calculations
   const packagePrice = clientSelectedPkg ? clientSelectedPkg.harga_rm : 0;
@@ -49,7 +49,7 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
 
     // WA Link format: wa.me/PHONENUMBER?text=MESSAGE
     // Let's use a placeholder Indonesian WA admin number (e.g., 6281234567890) or let the user configure it.
-    const adminPhone = "628117771234"; // standard Batam admin code
+    const adminPhone = "6281266648244";
     const message = `Halo Admin, saya ingin memesan paket ${clientSelectedPkg.nama}. Detail: Jumlah Pax: ${pax}, Total Harga: RM ${totalPrice}. Mohon informasinya.`;
     const encodedMessage = encodeURIComponent(message);
     const waUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
