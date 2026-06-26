@@ -89,7 +89,16 @@ export default function AdminPage() {
       const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
       const path = typeof window !== "undefined" ? window.location.pathname.replace("/admin", "") : "/";
       
-      const link = `${origin}${path}?reviewToken=${token}`;
+      let link = `${origin}${path}?reviewToken=${token}`;
+      if (customerName.trim()) {
+        link += `&name=${encodeURIComponent(customerName.trim())}`;
+      }
+      if (customerTitle) {
+        link += `&title=${encodeURIComponent(customerTitle)}`;
+      }
+      if (selectedPkg) {
+        link += `&package=${encodeURIComponent(selectedPkg)}`;
+      }
       
       setGeneratedLink(link);
       setLinkCopied(false);
@@ -182,6 +191,64 @@ export default function AdminPage() {
     );
   }
 
+  const packageOptions = [
+    {
+      id: "Batam & Bintan 3D2N",
+      name: "Batam & Bintan",
+      desc: "3D2N (Best Seller)",
+      badge: "Best Seller",
+      color: "amber",
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499c.174-.627 1.066-.627 1.24 0l2.22 5.923a1 1 0 0 0 .746.592l6.236.424c.673.046.942.873.454 1.313l-4.78 4.316a1 1 0 0 0-.317.976l1.455 6.076c.157.656-.566 1.18-.117.842L12 17.25l-5.385 3.324c-.58.358-1.3-.165-1.144-.816l1.393-5.834a1 1 0 0 0-.31-.962L1.83 11.66c-.495-.44-.224-1.272.454-1.323l6.294-.48a1 1 0 0 0 .756-.605l2.15-5.653Z" />
+        </svg>
+      )
+    },
+    {
+      id: "Batam 2D1N",
+      name: "Batam City Tour",
+      desc: "2D1N City Tour",
+      badge: "Favorite",
+      color: "emerald",
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12" />
+        </svg>
+      )
+    },
+    {
+      id: "Batam 3D2N (Essential)",
+      name: "Batam Essential",
+      desc: "3D2N (Essential)",
+      badge: "Essential",
+      color: "indigo",
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5-7.75-6-2.182m0 0-4.5 1.636m-1.5.545L2.25 9m13.5-5.455V21m-4.5-10.25h.008v.008H12v-.008Z" />
+        </svg>
+      )
+    },
+    {
+      id: "Custom Route / Sewa Mobil Only",
+      name: "Sewa Mobil Only",
+      desc: "Custom Route / Rental",
+      badge: "Flexible",
+      color: "sky",
+      icon: (
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
+        </svg>
+      )
+    }
+  ];
+
+  const expiryOptions = [
+    { value: 15, label: "15 Menit", tag: "" },
+    { value: 30, label: "30 Menit", tag: "Rekomendasi" },
+    { value: 60, label: "1 Jam", tag: "" },
+    { value: 1440, label: "1 Hari", tag: "" }
+  ];
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
       {/* Header */}
@@ -265,37 +332,94 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label htmlFor="adm-pkg-select" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                   Paket Tour yang Diikuti
-                </label>
-                <select
-                  id="adm-pkg-select"
-                  value={selectedPkg}
-                  onChange={(e) => setSelectedPkg(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none cursor-pointer"
-                >
-                  <option value="Batam & Bintan 3D2N">Batam & Bintan 3D2N (Best Seller)</option>
-                  <option value="Batam 2D1N">Batam 2D1N City Tour</option>
-                  <option value="Batam 3D2N (Essential)">Batam 3D2N (Essential)</option>
-                  <option value="Custom Route / Sewa Mobil Only">Sewa Mobil / Custom Route</option>
-                </select>
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  {packageOptions.map((pkg) => {
+                    const isSelected = selectedPkg === pkg.id;
+                    return (
+                      <button
+                        key={pkg.id}
+                        type="button"
+                        onClick={() => setSelectedPkg(pkg.id)}
+                        className={`flex flex-col items-start text-left p-3 rounded-2xl border-2 transition-all duration-200 cursor-pointer relative overflow-hidden select-none active:scale-[0.98]
+                          ${isSelected 
+                            ? "border-blue-600 bg-blue-50/40 text-blue-900 shadow-sm" 
+                            : "border-slate-200 bg-white hover:border-slate-350 text-slate-700 hover:bg-slate-50"
+                          }
+                        `}
+                      >
+                        <div className="flex items-center justify-between w-full mb-2">
+                          <div className={`p-1.5 rounded-lg ${isSelected ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 text-slate-500"}`}>
+                            {pkg.icon}
+                          </div>
+                          {pkg.badge && (
+                            <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md tracking-wider border
+                              ${isSelected 
+                                ? "bg-blue-100 text-blue-800 border-blue-200/50" 
+                                : pkg.color === "amber" 
+                                  ? "bg-amber-50 text-amber-800 border-amber-100" 
+                                  : pkg.color === "emerald" 
+                                    ? "bg-emerald-50 text-emerald-800 border-emerald-100" 
+                                    : pkg.color === "indigo" 
+                                      ? "bg-indigo-50 text-indigo-800 border-indigo-100" 
+                                      : "bg-sky-50 text-sky-800 border-sky-100"
+                              }
+                            `}>
+                              {pkg.badge}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-black tracking-tight leading-none mb-1">{pkg.name}</span>
+                        <span className={`text-[9px] font-medium leading-none ${isSelected ? "text-blue-700" : "text-slate-450"}`}>
+                          {pkg.desc}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>
-                <label htmlFor="adm-expiry-select" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                   Masa Aktif Link
-                </label>
-                <select
-                  id="adm-expiry-select"
-                  value={expiryMinutes}
-                  onChange={(e) => setExpiryMinutes(parseInt(e.target.value))}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none cursor-pointer"
-                >
-                  <option value={15}>15 Menit</option>
-                  <option value={30}>30 Menit (Direkomendasikan)</option>
-                  <option value={60}>1 Jam</option>
-                  <option value={1440}>1 Hari</option>
-                </select>
+                </span>
+                <div className="grid grid-cols-2 gap-3">
+                  {expiryOptions.map((opt) => {
+                    const isSelected = expiryMinutes === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setExpiryMinutes(opt.value)}
+                        className={`flex items-center justify-between p-3 rounded-2xl border-2 text-xs font-bold transition-all duration-200 cursor-pointer select-none active:scale-[0.98]
+                          ${isSelected
+                            ? "border-blue-600 bg-blue-50/40 text-blue-900 shadow-sm"
+                            : "border-slate-200 bg-white hover:border-slate-350 text-slate-650 hover:bg-slate-50"
+                          }
+                        `}
+                      >
+                        <span className="flex items-center gap-2">
+                          <svg className={`w-4 h-4 ${isSelected ? "text-blue-600" : "text-slate-400"}`} fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          {opt.label}
+                        </span>
+                        {opt.tag && (
+                          <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md tracking-wider border
+                            ${isSelected 
+                              ? "bg-blue-600 text-white border-blue-750" 
+                              : "bg-emerald-50 text-emerald-800 border-emerald-100"
+                            }
+                          `}>
+                            {opt.tag}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <button
@@ -404,7 +528,7 @@ export default function AdminPage() {
             
             <h3 className="text-base font-extrabold text-slate-800 text-center mb-2">Konfirmasi Hapus</h3>
             <p className="text-xs text-slate-500 text-center leading-relaxed mb-6">
-              Apakah Anda yakin ingin menghapus ulasan ini secara permanen dari database Supabase? Tindakan ini tidak dapat dibatalkan.
+              Apakah Anda yakin ingin menghapus ulasan ini secara permanen? Tindakan ini tidak dapat dibatalkan.
             </p>
             
             <div className="flex gap-3">

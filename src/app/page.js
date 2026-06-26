@@ -65,6 +65,14 @@ export default function Home() {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("reviewToken");
     if (token) {
+      const name = urlParams.get("name");
+      const title = urlParams.get("title");
+      const pkg = urlParams.get("package");
+
+      if (name) setNewReviewName(name);
+      if (title) setNewReviewTitle(title);
+      if (pkg) setNewReviewPkg(pkg);
+
       validateAndOpenReviewModal(token);
     }
   }, []);
