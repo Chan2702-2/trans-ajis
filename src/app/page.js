@@ -2,11 +2,37 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { PACKAGES } from "@/constants/packages";
 import { BLOG_ARTICLES } from "@/constants/articles";
 import BookingForm from "@/components/BookingForm";
+import { supabase } from "@/supabaseClient";
 
 export default function Home() {
+  // State for Search Module
+  const [searchDest, setSearchDest] = useState("");
+  const [showDestModal, setShowDestModal] = useState(false);
+  const [searchDate, setSearchDate] = useState("");
+  const [showSearchUserModal, setShowSearchUserModal] = useState(false);
+  const [searchUserTitle, setSearchUserTitle] = useState("Mr.");
+  const [searchUserName, setSearchUserName] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [toastType, setToastType] = useState("error"); // "error" | "success"
+
+  // State for Booking Form
+  const [selectedPackageId, setSelectedPackageId] = useState("");
+  const [activeArticle, setActiveArticle] = useState(null);
+
+  // State for Reviews Section
+  const [reviews, setReviews] = useState([]);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [newReviewName, setNewReviewName] = useState("");
+  const [newReviewTitle, setNewReviewTitle] = useState("Mr.");
+  const [newReviewComment, setNewReviewComment] = useState("");
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewPhoto, setNewReviewPhoto] = useState("");
+  const [activeToken, setActiveToken] = useState(null);
+
   // Setup Intersection Observer for Scroll Reveal
   useEffect(() => {
     const observerOptions = {
@@ -30,20 +56,67 @@ export default function Home() {
     return () => {
       elements.forEach((el) => observer.unobserve(el));
     };
+  }, [reviews]);
+
+  // Effect to handle Magic Review Link validation with Supabase
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("reviewToken");
+    if (token) {
+      validateAndOpenReviewModal(token);
+    }
   }, []);
 
-  // State for Search Module
-  const [searchDest, setSearchDest] = useState("");
-  const [showDestModal, setShowDestModal] = useState(false);
-  const [searchDate, setSearchDate] = useState("");
-  const [showSearchUserModal, setShowSearchUserModal] = useState(false);
-  const [searchUserTitle, setSearchUserTitle] = useState("Mr.");
-  const [searchUserName, setSearchUserName] = useState("");
-  const [searchError, setSearchError] = useState("");
+  const validateAndOpenReviewModal = async (token) => {
+    try {
+      const { data, error } = await supabase
+        .from("magic_links")
+        .select("*")
+        .eq("token", token)
+        .single();
 
-  // State for Booking Form
-  const [selectedPackageId, setSelectedPackageId] = useState("");
-  const [activeArticle, setActiveArticle] = useState(null);
+      if (error || !data) {
+        setSearchError("Link ulasan tidak valid atau rusak.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      if (data.used) {
+        setSearchError("Link ulasan ini sudah digunakan untuk menulis ulasan.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      const expiryTime = new Date(data.expires_at).getTime();
+      if (Date.now() > expiryTime) {
+        setSearchError("Link ulasan kedaluwarsa! Link ini hanya aktif selama 30 menit.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      // If valid, save active token state & show modal
+      setActiveToken(token);
+      setShowReviewModal(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      // Timeout auto close when token expires
+      const timeLeft = expiryTime - Date.now();
+      const timer = setTimeout(() => {
+        setShowReviewModal(false);
+        setSearchError("Sesi ulasan berakhir! Link ulasan Anda telah kedaluwarsa.");
+        setActiveToken(null);
+      }, timeLeft);
+      return () => clearTimeout(timer);
+    } catch (err) {
+      console.error(err);
+      setSearchError("Terjadi kesalahan memvalidasi link ulasan.");
+    }
+  };
+  const [newReviewPkg, setNewReviewPkg] = useState("Batam & Bintan 3D2N");
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [showLinkGeneratorModal, setShowLinkGeneratorModal] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState("");
 
   const getTodayDateString = () => {
     const today = new Date();
@@ -144,6 +217,169 @@ export default function Home() {
     const details = `Pemesan: ${searchUserTitle} ${searchUserName}\nDestinasi tujuan: ${searchDest}${searchDate ? `, Rencana Tanggal: ${searchDate}` : ""}`;
     handleWAFlow("Pencarian Rute / Jadwal", details);
     setShowSearchUserModal(false);
+  };
+
+
+
+  useEffect(() => {
+    async function fetchHomepageReviews() {
+      try {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const formatted = data.map((item) => ({
+            id: item.id,
+            name: item.name,
+            rating: item.rating,
+            comment: item.comment,
+            photo: item.photo || "",
+            package: item.package || "",
+            date: new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+          }));
+          setReviews(formatted);
+        } else {
+          setReviews([]);
+        }
+      } catch (err) {
+        console.error("Gagal load reviews di homepage:", err);
+        setReviews([]);
+      }
+    }
+    fetchHomepageReviews();
+  }, []);
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setPhotoUploading(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 200;
+        const MAX_HEIGHT = 200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
+        setNewReviewPhoto(compressedBase64);
+        setPhotoUploading(false);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!newReviewName.trim() || !newReviewComment.trim()) {
+      setSearchError("Silakan isi nama dan ulasan Anda.");
+      return;
+    }
+
+    const payloadName = `${newReviewTitle} ${newReviewName}`;
+
+    try {
+      // 1. Simpan ulasan ke tabel reviews di Supabase
+      const { data: insertedData, error: insertError } = await supabase
+        .from("reviews")
+        .insert([
+          {
+            name: payloadName,
+            rating: newReviewRating,
+            comment: newReviewComment,
+            photo: newReviewPhoto || null,
+            package: newReviewPkg || null
+          }
+        ])
+        .select();
+
+      if (insertError) throw insertError;
+
+      // 2. Tandai token ulasan aktif sebagai used (sudah terpakai) di Supabase jika ada token aktif
+      if (activeToken) {
+        const { error: tokenError } = await supabase
+          .from("magic_links")
+          .update({ used: true })
+          .eq("token", activeToken);
+
+        if (tokenError) console.error("Gagal menonaktifkan token:", tokenError);
+      }
+
+      // 3. Update reviews state lokal agar langsung muncul di beranda
+      if (insertedData && insertedData[0]) {
+        const item = insertedData[0];
+        const newRev = {
+          id: item.id,
+          name: item.name,
+          rating: item.rating,
+          comment: item.comment,
+          photo: item.photo || "",
+          package: item.package || "",
+          date: new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+        };
+        setReviews((prev) => [newRev, ...prev]);
+      }
+
+      // Reset Form
+      setNewReviewName("");
+      setNewReviewTitle("Mr.");
+      setNewReviewComment("");
+      setNewReviewRating(5);
+      setNewReviewPhoto("");
+      setNewReviewPkg("Batam & Bintan 3D2N");
+      setShowReviewModal(false);
+      setActiveToken(null);
+
+      setToastType("success");
+      setSearchError("Ulasan Anda berhasil disimpan. Terima kasih!");
+      setTimeout(() => setSearchError(""), 4000);
+    } catch (err) {
+      console.error("Gagal mengirim ulasan ke Supabase:", err);
+      setToastType("error");
+      setSearchError("Gagal mengirim ulasan ke database. Silakan coba kembali.");
+    }
+  };
+
+  const handleGenerateMagicLink = () => {
+    const expiresAt = Date.now() + 30 * 60 * 1000;
+    const token = btoa(expiresAt.toString());
+    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+    const path = typeof window !== "undefined" ? window.location.pathname : "/";
+    const link = `${origin}${path}?reviewToken=${token}`;
+    setGeneratedLink(link);
+  };
+
+  const handleCopyLink = () => {
+    if (!generatedLink) return;
+    navigator.clipboard.writeText(generatedLink);
+    setToastType("success");
+    setSearchError("Link berhasil disalin ke clipboard!");
+    setTimeout(() => setSearchError(""), 3000);
   };
 
   return (
@@ -824,6 +1060,280 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Reviews Section */}
+      <section id="reviews" className="py-20 border-t border-slate-200 bg-slate-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-4 text-center md:text-left">
+            <div>
+              <h2 className="text-3xl font-extrabold text-[#1A365D] tracking-tight">
+                Ulasan Pelanggan
+              </h2>
+              <p className="mt-2 text-sm text-slate-650 max-w-xl">
+                Apa kata mereka yang telah merasakan pelayanan terbaik kami di Batam & Bintan.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3 justify-center md:justify-end">
+              <Link
+                href="/ulasan"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1A365D] hover:bg-[#2C5282] text-xs sm:text-sm font-bold text-white px-5 py-3 transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                Lihat Semua Ulasan
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+
+          {reviews.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {reviews.slice(0, 5).map((rev) => (
+                <div 
+                  key={rev.id} 
+                  className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-3 duration-500"
+                >
+                  <div>
+                    <div className="flex items-center gap-3.5 mb-4">
+                      <div className="relative w-11 h-11 rounded-full overflow-hidden border border-slate-200 shrink-0 bg-slate-50 flex items-center justify-center">
+                        {rev.photo ? (
+                          <Image
+                            src={rev.photo}
+                            alt={rev.name}
+                            fill
+                            sizes="44px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-slate-400">FA</span>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-extrabold text-[#1A365D]">{rev.name}</h4>
+                        <span className="text-[10px] text-slate-400 font-semibold">{rev.date}</span>
+                      </div>
+                    </div>
+
+                    {/* Stars */}
+                    <div className="flex gap-0.5 text-amber-400 mb-2.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg
+                          key={i}
+                          className={`w-4 h-4 ${i < rev.rating ? "fill-current" : "stroke-current text-slate-300"}`}
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                      ))}
+                    </div>
+
+                    {/* Selected Package Badge */}
+                    {rev.package && (
+                      <div className="mb-3">
+                        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-100/50">
+                          Paket: {rev.package}
+                        </span>
+                      </div>
+                    )}
+
+                    <p className="text-xs md:text-sm text-slate-650 leading-relaxed italic">
+                      "{rev.comment}"
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-white border border-slate-200 rounded-3xl max-w-xl mx-auto shadow-sm animate-in fade-in duration-500">
+              <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <h3 className="text-sm font-extrabold text-[#1A365D] mb-1">Belum ada ulasan</h3>
+              <p className="text-xs text-slate-500 px-6 leading-relaxed max-w-md mx-auto">
+                Feedback asli dari pelanggan setia kami akan muncul di sini secara otomatis setelah pelanggan mengisi formulir ulasan.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Review Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowReviewModal(false)}
+          />
+
+          <form 
+            onSubmit={handleReviewSubmit}
+            className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-md select-none animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-sm font-extrabold text-[#1A365D]">Tulis Ulasan Anda</h4>
+              <button
+                type="button"
+                onClick={() => setShowReviewModal(false)}
+                className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Sapaan & Nama */}
+              <div className="grid grid-cols-12 gap-3">
+                <div className="col-span-4">
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    Sapaan
+                  </label>
+                  <div className="flex rounded-xl border border-slate-200 p-1 bg-slate-50 gap-1 h-[42px] items-center">
+                    {["Mr.", "Mrs.", "Ms."].map((t) => {
+                      const isActive = newReviewTitle === t;
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setNewReviewTitle(t)}
+                          className={`flex-1 text-center py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none
+                            ${isActive 
+                              ? "bg-blue-600 text-white shadow-sm" 
+                              : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                            }
+                          `}
+                        >
+                          {t.replace(".", "")}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="col-span-8">
+                  <label htmlFor="rev-name-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    Nama Lengkap
+                  </label>
+                  <input
+                    id="rev-name-input"
+                    type="text"
+                    value={newReviewName}
+                    onChange={(e) => setNewReviewName(e.target.value)}
+                    placeholder="Nama Anda"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Rating */}
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Rating Bintang
+                </label>
+                <div className="flex gap-1.5 text-slate-300">
+                  {[1, 2, 3, 4, 5].map((val) => {
+                    const isFilled = val <= newReviewRating;
+                    return (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setNewReviewRating(val)}
+                        className={`w-7 h-7 transition-all cursor-pointer ${isFilled ? "text-amber-400" : "text-slate-300 hover:text-amber-300"}`}
+                      >
+                        <svg className="w-full h-full fill-current" viewBox="0 0 24 24">
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Tour Package Selection */}
+              <div>
+                <label htmlFor="rev-pkg-select" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Pilih Paket Tour
+                </label>
+                <select
+                  id="rev-pkg-select"
+                  value={newReviewPkg}
+                  onChange={(e) => setNewReviewPkg(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all cursor-pointer"
+                  required
+                >
+                  <option value="Batam & Bintan 3D2N">Batam & Bintan 3D2N (Best Seller)</option>
+                  <option value="Batam 2D1N">Batam 2D1N City Tour</option>
+                  <option value="Batam 3D2N (Essential)">Batam 3D2N (Essential)</option>
+                  <option value="Custom Route / Sewa Mobil Only">Sewa Mobil / Custom Route</option>
+                </select>
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label htmlFor="rev-comment-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Ulasan / Testimoni
+                </label>
+                <textarea
+                  id="rev-comment-input"
+                  value={newReviewComment}
+                  onChange={(e) => setNewReviewComment(e.target.value)}
+                  placeholder="Tulis ulasan perjalanan Anda..."
+                  rows="3"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all"
+                  required
+                />
+              </div>
+
+              {/* Photo Upload */}
+              <div>
+                <label htmlFor="rev-photo-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Foto Profil (Optional)
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    id="rev-photo-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="rev-photo-input"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-bold text-slate-700 px-4 py-2.5 transition-all cursor-pointer active:scale-95"
+                  >
+                    Pilih Foto
+                  </label>
+                  {photoUploading && (
+                    <span className="text-[10px] text-blue-600 font-bold animate-pulse">Mengompres foto...</span>
+                  )}
+                  {newReviewPhoto && !photoUploading && (
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-slate-200">
+                      <Image
+                        src={newReviewPhoto}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+                <p className="text-[9px] text-slate-400 font-medium mt-1">Foto akan dioptimalkan otomatis agar berukuran kecil (~30kb).</p>
+              </div>
+
+              {/* Submit button */}
+              <button
+                type="submit"
+                disabled={photoUploading}
+                className="w-full inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 py-3.5 text-xs font-bold text-white transition-all shadow-md active:scale-95 cursor-pointer disabled:bg-slate-300 disabled:cursor-not-allowed"
+              >
+                Simpan Ulasan
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Contact Section */}
       <section id="contact" className="py-20 bg-slate-50 border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1145,22 +1655,98 @@ export default function Home() {
           </form>
         </div>
       )}
+      {/* Magic Link Generator Modal */}
+      {showLinkGeneratorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowLinkGeneratorModal(false)}
+          />
+
+          <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-md select-none animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-sm font-extrabold text-[#1A365D]">Generator Link Ulasan</h4>
+              <button
+                type="button"
+                onClick={() => setShowLinkGeneratorModal(false)}
+                className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Buat link khusus bagi pelanggan untuk memberikan ulasan. Link ini otomatis **kedaluwarsa dalam 30 menit** demi keamanan.
+              </p>
+
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl break-all">
+                <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider mb-1">Link Ulasan:</span>
+                <span className="text-xs font-semibold text-blue-600 select-all">{generatedLink || "Membuat link..."}</span>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleGenerateMagicLink}
+                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 py-3 text-xs font-bold text-slate-700 transition-all active:scale-95 cursor-pointer"
+                >
+                  Buat Ulang Link
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 py-3 text-xs font-bold text-white transition-all shadow-md active:scale-95 cursor-pointer"
+                >
+                  Salin Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Custom Toast Warning Notification */}
       {searchError && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-red-50 border border-red-200 shadow-xl rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-5 duration-300 max-w-sm">
-          <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 border shadow-xl rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-5 duration-300 max-w-sm
+          ${toastType === "success" 
+            ? "bg-emerald-50 border-emerald-250 text-emerald-800" 
+            : "bg-red-50 border-red-200 text-red-800"
+          }
+        `}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0
+            ${toastType === "success" ? "bg-emerald-100" : "bg-red-100"}
+          `}>
+            {toastType === "success" ? (
+              <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            )}
           </div>
           <div>
-            <h5 className="text-[10px] font-bold text-red-800 uppercase tracking-wider">Perhatian</h5>
-            <p className="text-xs text-red-700 font-semibold mt-0.5">{searchError}</p>
+            <h5 className={`text-[10px] font-bold uppercase tracking-wider
+              ${toastType === "success" ? "text-emerald-800" : "text-red-800"}
+            `}>
+              {toastType === "success" ? "Sukses" : "Perhatian"}
+            </h5>
+            <p className={`text-xs font-semibold mt-0.5
+              ${toastType === "success" ? "text-emerald-700" : "text-red-700"}
+            `}>
+              {searchError}
+            </p>
           </div>
           <button 
             type="button"
             onClick={() => setSearchError("")}
-            className="text-red-400 hover:text-red-600 ml-auto shrink-0 cursor-pointer"
+            className={`ml-auto shrink-0 cursor-pointer
+              ${toastType === "success" ? "text-emerald-400 hover:text-emerald-600" : "text-red-400 hover:text-red-600"}
+            `}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
