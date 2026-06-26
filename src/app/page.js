@@ -36,6 +36,10 @@ export default function Home() {
   const [searchDest, setSearchDest] = useState("");
   const [showDestModal, setShowDestModal] = useState(false);
   const [searchDate, setSearchDate] = useState("");
+  const [showSearchUserModal, setShowSearchUserModal] = useState(false);
+  const [searchUserTitle, setSearchUserTitle] = useState("Mr.");
+  const [searchUserName, setSearchUserName] = useState("");
+  const [searchError, setSearchError] = useState("");
 
   // State for Booking Form
   const [selectedPackageId, setSelectedPackageId] = useState("");
@@ -125,15 +129,25 @@ export default function Home() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (!searchDest) {
-      alert("Silakan pilih destinasi terlebih dahulu.");
+      setSearchError("Silakan pilih destinasi terlebih dahulu.");
       return;
     }
-    const details = `Destinasi tujuan: ${searchDest}${searchDate ? `, Rencana Tanggal: ${searchDate}` : ""}`;
+    setShowSearchUserModal(true);
+  };
+
+  const handleConfirmSearchBooking = (e) => {
+    e.preventDefault();
+    if (!searchUserName.trim()) {
+      setSearchError("Silakan isi nama Anda terlebih dahulu.");
+      return;
+    }
+    const details = `Pemesan: ${searchUserTitle} ${searchUserName}\nDestinasi tujuan: ${searchDest}${searchDate ? `, Rencana Tanggal: ${searchDate}` : ""}`;
     handleWAFlow("Pencarian Rute / Jadwal", details);
+    setShowSearchUserModal(false);
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans selection:bg-blue-500 selection:text-white"
       style={{
         backgroundImage: 'radial-gradient(#e2e8f0 1.5px, transparent 1.5px)',
@@ -167,8 +181,13 @@ export default function Home() {
           </nav>
 
           <button
-            onClick={() => handleWAFlow("Booking Langsung", "Ingin memesan armada / paket tour sesegera mungkin.")}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95"
+            onClick={() => {
+              const bookingSec = document.getElementById("booking-section");
+              if (bookingSec) {
+                bookingSec.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95 cursor-pointer"
           >
             Book Now
           </button>
@@ -1040,6 +1059,104 @@ export default function Home() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Search User Details Modal */}
+      {showSearchUserModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowSearchUserModal(false)}
+          />
+
+          {/* Modal Container */}
+          <form 
+            onSubmit={handleConfirmSearchBooking}
+            className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-md select-none animate-in fade-in zoom-in-95 duration-200"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-sm font-extrabold text-[#1A365D]">Informasi Pemesan</h4>
+              <button
+                type="button"
+                onClick={() => setShowSearchUserModal(false)}
+                className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Form Fields */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-12 gap-3">
+                <div className="col-span-4">
+                  <label htmlFor="search-title-select" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">
+                    Sapaan
+                  </label>
+                  <select
+                    id="search-title-select"
+                    value={searchUserTitle}
+                    onChange={(e) => setSearchUserTitle(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all cursor-pointer"
+                    required
+                  >
+                    <option value="Mr.">Mr.</option>
+                    <option value="Mrs.">Mrs.</option>
+                    <option value="Ms.">Ms.</option>
+                  </select>
+                </div>
+                <div className="col-span-8">
+                  <label htmlFor="search-name-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1">
+                    Nama Lengkap
+                  </label>
+                  <input
+                    id="search-name-input"
+                    type="text"
+                    value={searchUserName}
+                    onChange={(e) => setSearchUserName(e.target.value)}
+                    placeholder="Masukkan nama Anda"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Submit button */}
+              <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 py-3 text-xs font-bold text-white transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                Cari & Hubungi via WhatsApp
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+      {/* Custom Toast Warning Notification */}
+      {searchError && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-red-50 border border-red-200 shadow-xl rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-5 duration-300 max-w-sm">
+          <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+            <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h5 className="text-[10px] font-bold text-red-800 uppercase tracking-wider">Perhatian</h5>
+            <p className="text-xs text-red-700 font-semibold mt-0.5">{searchError}</p>
+          </div>
+          <button 
+            type="button"
+            onClick={() => setSearchError("")}
+            className="text-red-400 hover:text-red-600 ml-auto shrink-0 cursor-pointer"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
     </div>

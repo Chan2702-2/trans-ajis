@@ -8,6 +8,8 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
   const [pax, setPax] = useState(4);
   const [clientSelectedPkg, setClientSelectedPkg] = useState(null);
   const [showPackageModal, setShowPackageModal] = useState(false);
+  const [title, setTitle] = useState("Mr.");
+  const [name, setName] = useState("");
 
   // Sync with selected package from outside (e.g. when card is clicked)
   useEffect(() => {
@@ -52,13 +54,17 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
       alert(`Jumlah pax minimal untuk paket ini adalah ${clientSelectedPkg.min_pax || 4} pax.`);
       return;
     }
+    if (!name.trim()) {
+      alert("Silakan isi nama Anda terlebih dahulu.");
+      return;
+    }
 
     const adminPhone = "6281266648244";
     const originUrl = typeof window !== "undefined" ? window.location.origin : "";
     const imageUrl = clientSelectedPkg.image ? `${originUrl}${clientSelectedPkg.image}` : "";
 
     // Exact requested WA format
-    const message = `Hy, Fajri.\n\nSaya ingin memesan paket travel berikut:\n\nPaket: ${clientSelectedPkg.nama}\nJumlah Pax: ${pax} Orang\nTotal Harga: RM ${totalPrice.toLocaleString("id-ID")}\n\nMohon informasi selanjutnya. Terima kasih!`;
+    const message = `Hy, Fajri.\n\nSaya ingin memesan paket travel berikut:\n\nPemesan: ${title} ${name}\nPaket: ${clientSelectedPkg.nama}\nJumlah Pax: ${pax} Orang\nTotal Harga: RM ${totalPrice.toLocaleString("id-ID")}\n\nMohon informasi selanjutnya. Terima kasih!`;
     const encodedMessage = encodeURIComponent(message);
     const waUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
 
@@ -164,6 +170,40 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
           </div>
         </div>
  
+        {/* Input Sapaan & Nama Lengkap */}
+        <div className="grid grid-cols-12 gap-3">
+          <div className="col-span-4">
+            <label htmlFor="title-select" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Sapaan
+            </label>
+            <select
+              id="title-select"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all cursor-pointer"
+              required
+            >
+              <option value="Mr.">Mr.</option>
+              <option value="Mrs.">Mrs.</option>
+              <option value="Ms.">Ms.</option>
+            </select>
+          </div>
+          <div className="col-span-8">
+            <label htmlFor="name-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Nama Lengkap
+            </label>
+            <input
+              id="name-input"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Masukkan nama Anda"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all"
+              required
+            />
+          </div>
+        </div>
+
         {/* Input Jumlah Pax */}
         <div>
           <label htmlFor="pax-input" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
