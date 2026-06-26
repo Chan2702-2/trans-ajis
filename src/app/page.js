@@ -241,44 +241,130 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 mt-12 relative z-20">
           <form 
             onSubmit={handleSearchSubmit}
-            className="bg-white rounded-2xl p-4 shadow-lg border border-slate-200/80 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between"
+            className="bg-white rounded-2xl p-3 md:p-4 shadow-lg border border-slate-200/80 grid grid-cols-12 gap-2 md:gap-4 items-end"
           >
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Destination */}
-              <div className="flex flex-col">
-                <label htmlFor="dest-select" className="text-xs font-bold text-blue-900/60 uppercase tracking-wider mb-1.5 pl-1">
-                  Pilih Destinasi
-                </label>
+            {/* Destination */}
+            <div className="col-span-5 flex flex-col">
+              <label htmlFor="dest-select" className="text-[10px] md:text-xs font-bold text-blue-900/60 uppercase tracking-wider mb-1 pl-1">
+                Pilih Destinasi
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowDestModal(true)}
+                className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-2 md:px-4 py-2.5 md:py-3.5 text-xs md:text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all text-left"
+              >
+                <span className={`truncate ${searchDest ? "text-slate-800" : "text-slate-450 font-medium"}`}>
+                  {searchDest ? searchDest : "Ke mana?"}
+                </span>
+                <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400 shrink-0 ml-1" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+
+              {/* Destination Selector Modal */}
+              {showDestModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  {/* Backdrop */}
+                  <div 
+                    className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                    onClick={() => setShowDestModal(false)}
+                  />
+
+                  {/* Modal Container */}
+                  <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-md select-none animate-in fade-in zoom-in-95 duration-200">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-5">
+                      <h4 className="text-sm font-extrabold text-[#1A365D]">Pilih Destinasi Wisata</h4>
+                      <button
+                        type="button"
+                        onClick={() => setShowDestModal(false)}
+                        className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Options List */}
+                    <div className="space-y-3">
+                      {[
+                        { value: "Batam & Bintan 3D2N", label: "Batam & Bintan 3D2N", desc: "Best Seller - Wisata pantai & kolam renang terbesar" },
+                        { value: "Batam 2D1N", label: "Batam 2D1N City Tour", desc: "Relaxing - Keliling landmark & belanja seru" },
+                        { value: "Batam 3D2N (Essential)", label: "Batam 3D2N (Essential)", desc: "Essential - Paket lengkap durasi sedang" },
+                        { value: "Custom Route / Sewa Mobil Only", label: "Sewa Mobil / Custom Route", desc: "Rental armada premium dengan sopir berpengalaman" },
+                      ].map((opt) => {
+                        const isSelected = searchDest === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => {
+                              setSearchDest(opt.value);
+                              setShowDestModal(false);
+                            }}
+                            className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group cursor-pointer
+                              ${isSelected
+                                ? "border-blue-600 bg-blue-50/30"
+                                : "border-slate-200 hover:border-blue-400 hover:bg-slate-50/50"
+                              }
+                            `}
+                          >
+                            <div>
+                              <span className={`block text-xs font-bold transition-colors
+                                ${isSelected ? "text-blue-600" : "text-[#1A365D] group-hover:text-blue-600"}
+                              `}>
+                                {opt.label}
+                              </span>
+                              <span className="block text-[10px] text-slate-400 mt-1 font-medium">
+                                {opt.desc}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Custom Modern Departure Date Picker */}
+            <div className="col-span-4 flex flex-col relative">
+              <label className="text-[10px] md:text-xs font-bold text-blue-900/60 uppercase tracking-wider mb-1 pl-1">
+                Tanggal Keberangkatan
+              </label>
+              <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setShowDestModal(true)}
-                  className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all text-left"
+                  onClick={() => setShowCalendar(!showCalendar)}
+                  className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 pl-2 pr-8 md:pl-4 md:pr-10 py-2.5 md:py-3 text-xs md:text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all text-left"
                 >
-                  <span className={searchDest ? "text-slate-800" : "text-slate-450 font-medium"}>
-                    {searchDest ? searchDest : "Ke mana liburan Anda?"}
-                  </span>
-                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
+                  <span className="truncate">{searchDate ? getFormattedSearchDate() : "Pilih Tanggal"}</span>
+                  <div className="absolute inset-y-0 right-0 pr-2 md:pr-3.5 flex items-center pointer-events-none">
+                    <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                    </svg>
+                  </div>
                 </button>
 
-                {/* Destination Selector Modal */}
-                {showDestModal && (
+                {/* Calendar Modal Popup */}
+                {showCalendar && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    {/* Backdrop */}
+                    {/* Backdrop overlay */}
                     <div 
                       className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-                      onClick={() => setShowDestModal(false)}
+                      onClick={() => setShowCalendar(false)}
                     />
-
-                    {/* Modal Container */}
-                    <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-md select-none animate-in fade-in zoom-in-95 duration-200">
-                      {/* Header */}
-                      <div className="flex justify-between items-center mb-5">
-                        <h4 className="text-sm font-extrabold text-[#1A365D]">Pilih Destinasi Wisata</h4>
+                    
+                    {/* Modal Content */}
+                    <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-sm select-none animate-in fade-in zoom-in-95 duration-200">
+                      {/* Title & Close */}
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-sm font-extrabold text-[#1A365D]">Pilih Tanggal Keberangkatan</h4>
                         <button
-                          type="button"
-                          onClick={() => setShowDestModal(false)}
+                          type="button;;"
+                          onClick={() => setShowCalendar(false)}
                           className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -287,40 +373,71 @@ export default function Home() {
                         </button>
                       </div>
 
-                      {/* Options List */}
-                      <div className="space-y-3">
-                        {[
-                          { value: "Batam & Bintan 3D2N", label: "Batam & Bintan 3D2N", desc: "Best Seller - Wisata pantai & kolam renang terbesar" },
-                          { value: "Batam 2D1N", label: "Batam 2D1N City Tour", desc: "Relaxing - Keliling landmark & belanja seru" },
-                          { value: "Batam 3D2N (Essential)", label: "Batam 3D2N (Essential)", desc: "Essential - Paket lengkap durasi sedang" },
-                          { value: "Custom Route / Sewa Mobil Only", label: "Sewa Mobil / Custom Route", desc: "Rental armada premium dengan sopir berpengalaman" },
-                        ].map((opt) => {
-                          const isSelected = searchDest === opt.value;
+                      {/* Calendar Header */}
+                      <div className="flex justify-between items-center mb-4 bg-slate-50 rounded-xl p-2">
+                        <button
+                          type="button"
+                          onClick={handlePrevMonth}
+                          className="w-8 h-8 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                          </svg>
+                        </button>
+                        <span className="text-sm font-bold text-blue-900">
+                          {monthNames[calendarMonth]} {calendarYear}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleNextMonth}
+                          className="w-8 h-8 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Calendar Weekdays */}
+                      <div className="grid grid-cols-7 gap-1.5 text-center mb-2">
+                        {dayNames.map((day) => (
+                          <span key={day} className="text-[10px] font-bold text-slate-400 uppercase">
+                            {day}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Calendar Days Grid */}
+                      <div className="grid grid-cols-7 gap-1.5 justify-items-center">
+                        {/* Day padding */}
+                        {Array.from({ length: firstDayIndex }).map((_, i) => (
+                          <div key={`pad-${i}`} className="w-8 h-8" />
+                        ))}
+                        
+                        {/* Days numbers */}
+                        {Array.from({ length: daysInMonth }).map((_, i) => {
+                          const day = i + 1;
+                          const past = isPastDate(day);
+                          const formattedToCheck = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                          const isSelected = searchDate === formattedToCheck;
+                          
                           return (
                             <button
-                              key={opt.value}
+                              key={`day-${day}`}
                               type="button"
-                              onClick={() => {
-                                setSearchDest(opt.value);
-                                setShowDestModal(false);
-                              }}
-                              className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group cursor-pointer
-                                ${isSelected
-                                  ? "border-blue-600 bg-blue-50/30"
-                                  : "border-slate-200 hover:border-blue-400 hover:bg-slate-50/50"
+                              disabled={past}
+                              onClick={() => handleSelectDay(day)}
+                              className={`
+                                h-8 w-8 text-xs font-semibold rounded-lg flex items-center justify-center transition-all
+                                ${past 
+                                  ? "text-slate-200 cursor-not-allowed" 
+                                  : isSelected
+                                    ? "bg-blue-600 text-white font-bold shadow-md transform scale-110"
+                                    : "text-slate-700 hover:bg-slate-100 hover:scale-105"
                                 }
                               `}
                             >
-                              <div>
-                                <span className={`block text-xs font-bold transition-colors
-                                  ${isSelected ? "text-blue-600" : "text-[#1A365D] group-hover:text-blue-600"}
-                                `}>
-                                  {opt.label}
-                                </span>
-                                <span className="block text-[10px] text-slate-400 mt-1 font-medium">
-                                  {opt.desc}
-                                </span>
-                              </div>
+                              {day}
                             </button>
                           );
                         })}
@@ -329,134 +446,16 @@ export default function Home() {
                   </div>
                 )}
               </div>
-
-              {/* Custom Modern Departure Date Picker */}
-              <div className="flex flex-col relative">
-                <label className="text-xs font-bold text-blue-900/60 uppercase tracking-wider mb-1.5 pl-1">
-                  Tanggal Keberangkatan
-                </label>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowCalendar(!showCalendar)}
-                    className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 pl-4 pr-10 py-3 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all text-left"
-                  >
-                    <span>{getFormattedSearchDate()}</span>
-                    <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-                      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                      </svg>
-                    </div>
-                  </button>
-
-                  {/* Calendar Modal Popup */}
-                  {showCalendar && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                      {/* Backdrop overlay */}
-                      <div 
-                        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-                        onClick={() => setShowCalendar(false)}
-                      />
-                      
-                      {/* Modal Content */}
-                      <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-sm select-none animate-in fade-in zoom-in-95 duration-200">
-                        {/* Title & Close */}
-                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-sm font-extrabold text-[#1A365D]">Pilih Tanggal Keberangkatan</h4>
-                          <button
-                            type="button"
-                            onClick={() => setShowCalendar(false)}
-                            className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Calendar Header */}
-                        <div className="flex justify-between items-center mb-4 bg-slate-50 rounded-xl p-2">
-                          <button
-                            type="button"
-                            onClick={handlePrevMonth}
-                            className="w-8 h-8 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                            </svg>
-                          </button>
-                          <span className="text-sm font-bold text-blue-900">
-                            {monthNames[calendarMonth]} {calendarYear}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={handleNextMonth}
-                            className="w-8 h-8 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 shadow-sm border border-slate-100 transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Calendar Weekdays */}
-                        <div className="grid grid-cols-7 gap-1.5 text-center mb-2">
-                          {dayNames.map((day) => (
-                            <span key={day} className="text-[10px] font-bold text-slate-400 uppercase">
-                              {day}
-                            </span>
-                          ))}
-                        </div>
-
-                        {/* Calendar Days Grid */}
-                        <div className="grid grid-cols-7 gap-1.5 justify-items-center">
-                          {/* Day padding */}
-                          {Array.from({ length: firstDayIndex }).map((_, i) => (
-                            <div key={`pad-${i}`} className="w-8 h-8" />
-                          ))}
-                          
-                          {/* Days numbers */}
-                          {Array.from({ length: daysInMonth }).map((_, i) => {
-                            const day = i + 1;
-                            const past = isPastDate(day);
-                            const formattedToCheck = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                            const isSelected = searchDate === formattedToCheck;
-                            
-                            return (
-                              <button
-                                key={`day-${day}`}
-                                type="button"
-                                disabled={past}
-                                onClick={() => handleSelectDay(day)}
-                                className={`
-                                  h-8 w-8 text-xs font-semibold rounded-lg flex items-center justify-center transition-all
-                                  ${past 
-                                    ? "text-slate-200 cursor-not-allowed" 
-                                    : isSelected
-                                      ? "bg-blue-600 text-white font-bold shadow-md transform scale-110"
-                                      : "text-slate-700 hover:bg-slate-100 hover:scale-105"
-                                  }
-                                `}
-                              >
-                                {day}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
 
             {/* Submit Button */}
-            <div className="flex items-end justify-stretch md:justify-start pt-2 md:pt-0">
+            <div className="col-span-3">
               <button
                 type="submit"
-                className="w-full md:w-auto inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-8 py-3.5 transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
+                className="w-full inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-xs md:text-sm font-bold text-white py-2.5 md:py-3.5 transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
               >
-                Cari Jadwal
+                <span className="hidden md:inline">Cari Jadwal</span>
+                <span className="md:hidden">Cari</span>
               </button>
             </div>
           </form>
@@ -733,7 +732,7 @@ export default function Home() {
             <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-start gap-4 reveal-on-scroll reveal-delay-200">
               <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
                 </svg>
               </div>
               <div>
