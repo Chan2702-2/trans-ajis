@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PACKAGES } from "@/constants/packages";
+import { BLOG_ARTICLES } from "@/constants/articles";
 import BookingForm from "@/components/BookingForm";
 
 export default function Home() {
@@ -33,10 +34,12 @@ export default function Home() {
 
   // State for Search Module
   const [searchDest, setSearchDest] = useState("");
+  const [showDestModal, setShowDestModal] = useState(false);
   const [searchDate, setSearchDate] = useState("");
 
   // State for Booking Form
   const [selectedPackageId, setSelectedPackageId] = useState("");
+  const [activeArticle, setActiveArticle] = useState(null);
 
   const getTodayDateString = () => {
     const today = new Date();
@@ -113,8 +116,8 @@ export default function Home() {
   // Helper to generate WA Link
   const handleWAFlow = (pkgName, details = "") => {
     const adminPhone = "6281266648244";
-    const baseMessage = `Halo Admin Fajri Transport Batam, saya tertarik dengan paket: ${pkgName}.`;
-    const finalMessage = details ? `${baseMessage} ${details}` : baseMessage;
+    const baseMessage = `Hy, Fajri.\n\nSaya tertarik dengan paket: ${pkgName}.`;
+    const finalMessage = details ? `${baseMessage}\n\nDetail: ${details}` : baseMessage;
     const encoded = encodeURIComponent(finalMessage);
     window.open(`https://wa.me/${adminPhone}?text=${encoded}`, "_blank");
   };
@@ -144,7 +147,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="relative w-9 h-9 rounded-lg overflow-hidden shadow-sm border border-slate-200 bg-slate-50">
               <Image
-                src="/asset/img/logo-1.jpeg"
+                src="/asset/img/logo-1.png"
                 alt="Fajri Transport Batam Logo"
                 fill
                 className="object-cover"
@@ -159,6 +162,7 @@ export default function Home() {
             <a href="#packages" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Paket Tour</a>
             <a href="#benefits" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Keunggulan</a>
             <a href="#booking-section" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Booking</a>
+            <a href="#blog" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Blog</a>
             <a href="#contact" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Kontak</a>
           </nav>
 
@@ -188,7 +192,7 @@ export default function Home() {
               {/* Left Column: Text & CTA */}
               <div className="lg:col-span-7 space-y-6 text-left">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold text-blue-700 border border-blue-100 shadow-sm">
-                  ⚡ Partner Transportasi & Tour Resmi Batam
+                  Partner Transportasi & Tour Resmi Batam
                 </span>
                 <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#1A365D] leading-tight">
                   Eksplorasi Keindahan Batam & Bintan Bersama Partner Terpercaya
@@ -245,19 +249,85 @@ export default function Home() {
                 <label htmlFor="dest-select" className="text-xs font-bold text-blue-900/60 uppercase tracking-wider mb-1.5 pl-1">
                   Pilih Destinasi
                 </label>
-                <select
-                  id="dest-select"
-                  value={searchDest}
-                  onChange={(e) => setSearchDest(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all"
-                  required
+                <button
+                  type="button"
+                  onClick={() => setShowDestModal(true)}
+                  className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all text-left"
                 >
-                  <option value="" disabled hidden>Ke mana liburan Anda?</option>
-                  <option value="Batam & Bintan 3D2N">Batam & Bintan 3D2N (Best Seller)</option>
-                  <option value="Batam 2D1N">Batam 2D1N City Tour</option>
-                  <option value="Batam 3D2N (Essential)">Batam 3D2N (Essential)</option>
-                  <option value="Custom Route / Sewa Mobil Only">Sewa Mobil / Custom Route</option>
-                </select>
+                  <span className={searchDest ? "text-slate-800" : "text-slate-450 font-medium"}>
+                    {searchDest ? searchDest : "Ke mana liburan Anda?"}
+                  </span>
+                  <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+
+                {/* Destination Selector Modal */}
+                {showDestModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <div 
+                      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                      onClick={() => setShowDestModal(false)}
+                    />
+
+                    {/* Modal Container */}
+                    <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-md select-none animate-in fade-in zoom-in-95 duration-200">
+                      {/* Header */}
+                      <div className="flex justify-between items-center mb-5">
+                        <h4 className="text-sm font-extrabold text-[#1A365D]">Pilih Destinasi Wisata</h4>
+                        <button
+                          type="button"
+                          onClick={() => setShowDestModal(false)}
+                          className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Options List */}
+                      <div className="space-y-3">
+                        {[
+                          { value: "Batam & Bintan 3D2N", label: "Batam & Bintan 3D2N", desc: "Best Seller - Wisata pantai & kolam renang terbesar" },
+                          { value: "Batam 2D1N", label: "Batam 2D1N City Tour", desc: "Relaxing - Keliling landmark & belanja seru" },
+                          { value: "Batam 3D2N (Essential)", label: "Batam 3D2N (Essential)", desc: "Essential - Paket lengkap durasi sedang" },
+                          { value: "Custom Route / Sewa Mobil Only", label: "Sewa Mobil / Custom Route", desc: "Rental armada premium dengan sopir berpengalaman" },
+                        ].map((opt) => {
+                          const isSelected = searchDest === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => {
+                                setSearchDest(opt.value);
+                                setShowDestModal(false);
+                              }}
+                              className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group cursor-pointer
+                                ${isSelected
+                                  ? "border-blue-600 bg-blue-50/30"
+                                  : "border-slate-200 hover:border-blue-400 hover:bg-slate-50/50"
+                                }
+                              `}
+                            >
+                              <div>
+                                <span className={`block text-xs font-bold transition-colors
+                                  ${isSelected ? "text-blue-600" : "text-[#1A365D] group-hover:text-blue-600"}
+                                `}>
+                                  {opt.label}
+                                </span>
+                                <span className="block text-[10px] text-slate-400 mt-1 font-medium">
+                                  {opt.desc}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Custom Modern Departure Date Picker */}
@@ -673,6 +743,67 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>      {/* Blog/SEO Section */}
+      <section id="blog" className="py-20 border-t border-slate-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-extrabold text-[#1A365D] tracking-tight">
+              Artikel & Tips Perjalanan Batam
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-xl mx-auto">
+              Temukan rekomendasi destinasi wisata terbaik, tips sewa mobil hemat, dan panduan liburan seru di Batam & Bintan.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {BLOG_ARTICLES.map((article, idx) => (
+              <article 
+                key={article.id}
+                className={`group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 reveal-on-scroll ${
+                  idx % 3 === 1 ? 'reveal-delay-100' : idx % 3 === 2 ? 'reveal-delay-200' : ''
+                }`}
+              >
+                <div>
+                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+                    <Image
+                      src={article.image}
+                      alt={article.title}
+                      fill
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
+                    <div className="absolute top-4 left-4 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md z-10">
+                      {article.category}
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 text-slate-400 text-[10px] font-medium mb-3">
+                      <span>{article.date}</span>
+                      <span>•</span>
+                      <span>{article.readingTime}</span>
+                    </div>
+                    <h3 className="text-base font-bold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {article.summary}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-6 pt-0">
+                  <button 
+                    onClick={() => setActiveArticle(article)}
+                    className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    Baca Selengkapnya
+                    <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Contact Section */}
@@ -755,7 +886,7 @@ export default function Home() {
             <div className="lg:col-span-2 w-full h-[280px] lg:h-[350px] rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative bg-white">
               <iframe
                 title="Lokasi Fajri Transport Batam"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.48419688467!2d103.9242964893113!3d1.0182470726223293!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d98bcee06f0e9f%3A0x3039d80b220cc70!2sBatam%2C%20Batam%20City%2C%20Riau%20Islands!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
+                src="https://maps.google.com/maps?q=1.1467051,104.027821&z=17&output=embed"
                 className="w-full h-full border-0 absolute inset-0 opacity-90 hover:opacity-100 transition-opacity"
                 allowFullScreen=""
                 loading="lazy"
@@ -772,7 +903,7 @@ export default function Home() {
           <div className="flex justify-center items-center gap-2 text-white">
             <div className="relative w-7 h-7 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 shadow-sm">
               <Image
-                src="/asset/img/logo-1.jpeg"
+                src="/asset/img/logo-1.png"
                 alt="Fajri Transport Batam Logo"
                 fill
                 className="object-cover"
@@ -803,6 +934,115 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Blog Article Reader Modal */}
+      {activeArticle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity cursor-pointer animate-in fade-in duration-200"
+            onClick={() => setActiveArticle(null)}
+          />
+          {/* Modal content */}
+          <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 md:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto select-text animate-in fade-in zoom-in-95 duration-200">
+            {/* Close button */}
+            <button
+              onClick={() => setActiveArticle(null)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors z-10 cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Header info */}
+            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md uppercase tracking-wider">
+              {activeArticle.category}
+            </span>
+            <h2 className="text-xl md:text-2xl font-black text-[#1A365D] mt-3 mb-2 leading-tight">
+              {activeArticle.title}
+            </h2>
+            <div className="flex items-center gap-3 text-slate-400 text-xs font-semibold mb-6">
+              <span>{activeArticle.date}</span>
+              <span>•</span>
+              <span>{activeArticle.readingTime}</span>
+            </div>
+
+            {/* Image */}
+            <div className="relative aspect-[16/8] w-full rounded-2xl overflow-hidden mb-6 bg-slate-100 border border-slate-200/50">
+              <Image
+                src={activeArticle.image}
+                alt={activeArticle.title}
+                fill
+                className="object-cover"
+              />
+            </div>
+
+            {/* Content text */}
+            <div className="prose prose-slate max-w-none text-xs md:text-sm text-slate-650 leading-relaxed space-y-4">
+              {activeArticle.content.map((paragraph, index) => {
+                if (paragraph.startsWith("###")) {
+                  return (
+                    <h4 key={index} className="text-sm md:text-base font-bold text-[#1A365D] pt-2">
+                      {paragraph.replace("### ", "")}
+                    </h4>
+                  );
+                }
+                if (paragraph.startsWith("- ")) {
+                  // list item
+                  const cleanText = paragraph.replace("- ", "");
+                  // Split bold text if any: **text**: desc
+                  if (cleanText.includes("**")) {
+                    const parts = cleanText.split("**");
+                    return (
+                      <li key={index} className="list-disc ml-5 pl-1 my-1">
+                        <strong>{parts[1]}</strong>{parts[2]}
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={index} className="list-disc ml-5 pl-1 my-1">
+                      {cleanText}
+                    </li>
+                  );
+                }
+                // Check normal bold text like **Fajri Transport Batam**
+                if (paragraph.includes("**")) {
+                  const parts = paragraph.split("**");
+                  return (
+                    <p key={index}>
+                      {parts[0]}<strong>{parts[1]}</strong>{parts[2]}
+                    </p>
+                  );
+                }
+                return <p key={index}>{paragraph}</p>;
+              })}
+            </div>
+
+            {/* CTA inside modal */}
+            <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-left">
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tertarik dengan destinasi ini?</p>
+                <p className="text-xs font-semibold text-slate-600">Konsultasikan gratis perjalanan Anda bersama tim kami.</p>
+              </div>
+              <button
+                onClick={() => {
+                  setActiveArticle(null);
+                  const calcSec = document.getElementById("booking-section");
+                  if (calcSec) {
+                    calcSec.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-6 py-3.5 text-xs font-bold text-white transition-all shadow-sm active:scale-95 cursor-pointer"
+              >
+                Hubungi Kami & Pesan Paket
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

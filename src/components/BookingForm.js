@@ -53,9 +53,12 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
       return;
     }
 
-    // WA Link format: wa.me/PHONENUMBER?text=MESSAGE
     const adminPhone = "6281266648244";
-    const message = `Halo Admin, saya ingin memesan paket ${clientSelectedPkg.nama}. Detail: Jumlah Pax: ${pax}, Total Harga: RM ${totalPrice}. Mohon informasinya.`;
+    const originUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const imageUrl = clientSelectedPkg.image ? `${originUrl}${clientSelectedPkg.image}` : "";
+
+    // Exact requested WA format
+    const message = `Hy, Fajri.\n\nSaya ingin memesan paket travel berikut:\n\nPaket: ${clientSelectedPkg.nama}\nJumlah Pax: ${pax} Orang\nTotal Harga: RM ${totalPrice.toLocaleString("id-ID")}\n\nMohon informasi selanjutnya. Terima kasih!`;
     const encodedMessage = encodeURIComponent(message);
     const waUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
 

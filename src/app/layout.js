@@ -12,8 +12,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Batam Transport & Travel Agent | Paket Tour Terbaik",
+  title: "Fajri Tour & Travel Batam",
   description: "Pilihan paket tour Batam & Bintan terlengkap dengan armada prima dan fasilitas premium. Dapatkan promo bonus beli 10 pax gratis 1!",
+  icons: {
+    icon: "/asset/img/logo-1.png",
+  }
 };
 
 export default function RootLayout({ children }) {
