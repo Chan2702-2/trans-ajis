@@ -453,10 +453,10 @@ export default function Home() {
           </div>
           
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#packages" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Paket Tour</a>
+            <Link href="/paket-tour" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Paket Tour</Link>
             <a href="#benefits" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Keunggulan</a>
             <a href="#booking-section" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Booking</a>
-            <a href="#blog" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Blog</a>
+            <Link href="/blog" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Blog</Link>
             <a href="#contact" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Kontak</a>
           </nav>
 
@@ -1100,6 +1100,18 @@ export default function Home() {
                 </div>
               </article>
             ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/blog"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm font-bold text-white px-6 py-3.5 transition-all shadow-md active:scale-95 cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-300"
+            >
+              Lihat Semua Artikel
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>

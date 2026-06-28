@@ -3,6 +3,24 @@
 import { useState, useEffect } from "react";
 import { PACKAGES } from "@/constants/packages";
 
+const COUNTRIES = [
+  { code: "MY", name: "Malaysia", flag: "🇲🇾", popular: true },
+  { code: "SG", name: "Singapura", flag: "🇸🇬", popular: true },
+  { code: "ID", name: "Indonesia", flag: "🇮🇩", popular: true },
+  { code: "BN", name: "Brunei Darussalam", flag: "🇧🇳", popular: true },
+  { code: "TH", name: "Thailand", flag: "🇹🇭", popular: false },
+  { code: "VN", name: "Vietnam", flag: "🇻🇳", popular: false },
+  { code: "PH", name: "Filipina", flag: "🇵🇭", popular: false },
+  { code: "KH", name: "Kamboja", flag: "🇰🇭", popular: false },
+  { code: "LA", name: "Laos", flag: "🇱🇦", popular: false },
+  { code: "MM", name: "Myanmar", flag: "🇲🇲", popular: false },
+  { code: "JP", name: "Jepang", flag: "🇯🇵", popular: false },
+  { code: "KR", name: "Korea Selatan", flag: "🇰🇷", popular: false },
+  { code: "CN", name: "Tiongkok", flag: "🇨🇳", popular: false },
+  { code: "IN", name: "India", flag: "🇮🇳", popular: false },
+  { code: "OTHER", name: "Lainnya (Asia)", flag: "🌏", popular: false }
+];
+
 export default function BookingForm({ selectedPackageId, onPackageChange }) {
   const [selectedId, setSelectedId] = useState("");
   const [pax, setPax] = useState(4);
@@ -10,6 +28,9 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
   const [showPackageModal, setShowPackageModal] = useState(false);
   const [title, setTitle] = useState("Mr.");
   const [name, setName] = useState("");
+  const [country, setCountry] = useState("Malaysia");
+  const [showCountryModal, setShowCountryModal] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
 
   // Sync with selected package from outside (e.g. when card is clicked)
   useEffect(() => {
@@ -63,8 +84,8 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
     const originUrl = typeof window !== "undefined" ? window.location.origin : "";
     const imageUrl = clientSelectedPkg.image ? `${originUrl}${clientSelectedPkg.image}` : "";
 
-    // Exact requested WA format
-    const message = `Hy, Fajri.\n\nSaya ingin memesan paket travel berikut:\n\nPemesan: ${title} ${name}\nPaket: ${clientSelectedPkg.nama}\nJumlah Pax: ${pax} Orang\nTotal Harga: RM ${totalPrice.toLocaleString("id-ID")}\n\nMohon informasi selanjutnya. Terima kasih!`;
+    // Exact requested WA format with Country parameter
+    const message = `Hy, Fajri.\n\nSaya ingin memesan paket travel berikut:\n\nPemesan: ${title} ${name}\nNegara Asal: ${country}\nPaket: ${clientSelectedPkg.nama}\nJumlah Pax: ${pax} Orang\nTotal Harga: RM ${totalPrice.toLocaleString("id-ID")}\n\nMohon informasi selanjutnya. Terima kasih!`;
     const encodedMessage = encodeURIComponent(message);
     const waUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
 
@@ -210,6 +231,172 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all"
               required
             />
+          </div>
+        </div>
+
+        {/* Input Negara Asal */}
+        <div>
+          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            Negara Asal
+          </label>
+          <div className="relative">
+            <button
+              id="btn-select-country"
+              type="button"
+              onClick={() => setShowCountryModal(true)}
+              className="w-full flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all text-left cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-[9px] font-black uppercase bg-blue-50 border border-blue-100 text-blue-600 px-2 py-0.5 rounded tracking-wider">
+                  ASIA
+                </span>
+                <span className="text-slate-800">
+                  {COUNTRIES.find(c => c.name === country)?.flag} {country}
+                </span>
+              </span>
+              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+
+            {/* Country Selection Modal */}
+            {showCountryModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                {/* Backdrop overlay */}
+                <div 
+                  className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                  onClick={() => {
+                    setShowCountryModal(false);
+                    setCountrySearch("");
+                  }}
+                />
+
+                {/* Modal Container */}
+                <div className="relative bg-white rounded-3xl border border-slate-200/90 shadow-2xl p-6 w-full max-w-md select-none animate-in fade-in zoom-in-95 duration-200 max-h-[80vh] flex flex-col">
+                  {/* Header */}
+                  <div className="flex justify-between items-center mb-4 shrink-0">
+                    <div>
+                      <h4 className="text-sm font-extrabold text-[#1A365D] flex items-center gap-2">
+                        Pilih Negara Asal
+                        <span className="text-[9px] font-black uppercase bg-blue-50 border border-blue-100 text-blue-600 px-2 py-0.5 rounded tracking-wider">
+                          ASIA Only
+                        </span>
+                      </h4>
+                      <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Tentukan negara asal Anda untuk koordinasi penjemputan.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowCountryModal(false);
+                        setCountrySearch("");
+                      }}
+                      className="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors shrink-0"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Search Bar inside Modal */}
+                  <div className="relative mb-4 shrink-0">
+                    <input
+                      id="country-search-input"
+                      type="text"
+                      placeholder="Cari negara asal..."
+                      value={countrySearch}
+                      onChange={(e) => setCountrySearch(e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-2.5 text-xs font-semibold text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/25 transition-all shadow-inner"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Options List */}
+                  <div className="flex-grow overflow-y-auto space-y-4 pr-1 scrollbar-none">
+                    {/* Popular Countries (Malaysia, Singapore first) */}
+                    {!countrySearch && (
+                      <div>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Negara Populer</span>
+                        <div className="grid grid-cols-2 gap-2.5">
+                          {COUNTRIES.filter(c => c.popular).map((c) => {
+                            const isSelected = country === c.name;
+                            return (
+                              <button
+                                key={c.code}
+                                type="button"
+                                onClick={() => {
+                                  setCountry(c.name);
+                                  setShowCountryModal(false);
+                                }}
+                                className={`flex items-center gap-2 p-3 rounded-2xl border transition-all text-left cursor-pointer active:scale-95 w-full select-none
+                                  ${isSelected
+                                    ? "border-blue-600 bg-blue-50/50 text-blue-900 font-extrabold shadow-sm"
+                                    : "border-slate-200 hover:border-slate-300 bg-white text-slate-700 font-semibold"
+                                  }
+                                `}
+                              >
+                                <span className="text-xl leading-none">{c.flag}</span>
+                                <span className="text-xs">{c.name}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* All / Search Filtered Countries */}
+                    <div>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
+                        {countrySearch ? "Hasil Pencarian" : "Negara Asia Lainnya"}
+                      </span>
+                      <div className="space-y-2">
+                        {COUNTRIES.filter(c => 
+                          c.name.toLowerCase().includes(countrySearch.toLowerCase()) && 
+                          (countrySearch || !c.popular)
+                        ).map((c) => {
+                          const isSelected = country === c.name;
+                          return (
+                            <button
+                              key={c.code}
+                              type="button"
+                              onClick={() => {
+                                  setCountry(c.name);
+                                  setShowCountryModal(false);
+                                  setCountrySearch("");
+                              }}
+                              className={`w-full flex items-center gap-3 p-3 rounded-2xl border transition-all text-left cursor-pointer active:scale-[0.99] select-none
+                                ${isSelected
+                                  ? "border-blue-600 bg-blue-50/50 text-blue-900 font-extrabold shadow-sm"
+                                  : "border-slate-200 hover:border-slate-350 bg-white text-slate-700 font-semibold"
+                                }
+                              `}
+                            >
+                              <span className="text-xl leading-none shrink-0">{c.flag}</span>
+                              <span className="text-xs flex-grow">{c.name}</span>
+                              {isSelected && (
+                                <svg className="w-4 h-4 text-blue-600 shrink-0 animate-in zoom-in-50 duration-200" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                              )}
+                            </button>
+                          );
+                        })}
+                        {COUNTRIES.filter(c => 
+                          c.name.toLowerCase().includes(countrySearch.toLowerCase()) && 
+                          (countrySearch || !c.popular)
+                        ).length === 0 && (
+                          <p className="text-xs text-slate-400 italic py-4 text-center">Negara tidak ditemukan.</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
