@@ -22,6 +22,7 @@ export default function Home() {
   // State for Booking Form
   const [selectedPackageId, setSelectedPackageId] = useState("");
   const [activeArticle, setActiveArticle] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // State for Reviews Section
   const [reviews, setReviews] = useState([]);
@@ -460,18 +461,78 @@ export default function Home() {
             <a href="#contact" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Kontak</a>
           </nav>
 
-          <button
-            onClick={() => {
-              const bookingSec = document.getElementById("booking-section");
-              if (bookingSec) {
-                bookingSec.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95 cursor-pointer"
-          >
-            Book Now
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Hamburger Button (Hanya tampil di mobile, di sebelah kiri Book Now) */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+              aria-label="Menu Utama"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                )}
+              </svg>
+            </button>
+
+            <button
+              onClick={() => {
+                const bookingSec = document.getElementById("booking-section");
+                if (bookingSec) {
+                  bookingSec.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              Book Now
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Navigation Drawer / Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200 bg-white shadow-lg animate-mobile-menu">
+            <div className="px-4 py-3 space-y-1">
+              <Link
+                href="/paket-tour"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Paket Tour
+              </Link>
+              <a
+                href="#benefits"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Keunggulan
+              </a>
+              <a
+                href="#booking-section"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Booking
+              </a>
+              <Link
+                href="/blog"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Blog
+              </Link>
+              <a
+                href="#contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Kontak
+              </a>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* 3. Hero Section */}
@@ -971,6 +1032,19 @@ export default function Home() {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* Button Lihat Semua Paket */}
+          <div className="mt-12 text-center reveal-on-scroll">
+            <Link
+              href="/paket-tour"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-8 py-4 transition-all shadow-md active:scale-95 hover:shadow-lg"
+            >
+              Lihat Semua Paket
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>

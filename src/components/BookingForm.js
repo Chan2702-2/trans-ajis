@@ -34,10 +34,10 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
 
   // Sync with selected package from outside (e.g. when card is clicked)
   useEffect(() => {
-    if (selectedPackageId) {
+    if (selectedPackageId && selectedPackageId !== selectedId) {
       setSelectedId(selectedPackageId);
     }
-  }, [selectedPackageId]);
+  }, [selectedPackageId, selectedId]);
 
   // Update selected package details
   useEffect(() => {
@@ -46,10 +46,7 @@ export default function BookingForm({ selectedPackageId, onPackageChange }) {
     if (pkg) {
       setPax((prevPax) => Math.max(prevPax, pkg.min_pax || 4));
     }
-    if (onPackageChange && pkg && pkg.id !== selectedPackageId) {
-      onPackageChange(pkg.id);
-    }
-  }, [selectedId, onPackageChange, selectedPackageId]);
+  }, [selectedId]);
 
   // Calculations
   const packagePrice = clientSelectedPkg ? clientSelectedPkg.harga_rm : 0;

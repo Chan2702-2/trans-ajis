@@ -9,6 +9,7 @@ import BookingForm from "@/components/BookingForm";
 export default function PaketTourPage() {
   const [selectedPkgId, setSelectedPkgId] = useState("");
   const [activeFaq, setActiveFaq] = useState(null);
+  const [starFilter, setStarFilter] = useState("all"); // 'all' | 3 | 4
 
   const handleSelectPackage = (pkgId) => {
     setSelectedPkgId(pkgId);
@@ -18,10 +19,15 @@ export default function PaketTourPage() {
     }
   };
 
+  const filteredPackages = PACKAGES.filter((pkg) => {
+    if (starFilter === "all") return true;
+    return pkg.bintang === starFilter;
+  });
+
   const faqs = [
     {
       q: "Apakah paket tour sudah termasuk tiket ferry?",
-      a: "Ya! Seluruh paket tour kami (Paket 1, 2, dan 3) sudah termasuk tiket ferry pulang-pergi (PP) dari Singapura (HarbourFront) atau Malaysia (Johor Bahru) ke Batam, lengkap dengan pengurusan boarding."
+      a: "Ya! Seluruh paket tour kami sudah termasuk tiket ferry pulang-pergi (PP) dari Singapura (HarbourFront) atau Malaysia (Johor Bahru) ke Batam, lengkap dengan pengurusan boarding."
     },
     {
       q: "Apakah jadwal/itinerary tour bisa dicustom?",
@@ -33,13 +39,15 @@ export default function PaketTourPage() {
     },
     {
       q: "Apakah ada diskon atau bonus untuk rombongan?",
-      a: "Ya! Kami memiliki promo khusus rombongan. Untuk Paket 1 dan 2, setiap pembelian minimal 10 pax akan mendapatkan gratis 1 pax (FREE 1). Untuk Paket 3, berlaku kelipatan bonus setiap 10 pax (10+1 free, 20+2 free, dst)."
+      a: "Ya! Kami memiliki promo khusus rombongan. Setiap pembelian minimal 10 pax akan mendapatkan gratis 1 pax (FREE 1). Untuk Paket tertentu berlaku kelipatan bonus setiap 10 pax (10+1 free, 20+2 free, dst)."
     },
     {
       q: "Apakah armada transportasi yang digunakan bersifat pribadi?",
       a: "Ya, seluruh perjalanan menggunakan armada AC Private (tidak digabung dengan rombongan/wisatawan lain) untuk menjaga kenyamanan dan privasi liburan keluarga Anda."
     }
   ];
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans selection:bg-blue-500 selection:text-white">
@@ -79,13 +87,73 @@ export default function PaketTourPage() {
             </Link>
           </nav>
 
-          <button
-            onClick={() => handleSelectPackage("")}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95 cursor-pointer"
-          >
-            Pesan Sekarang
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Hamburger Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+              aria-label="Menu Utama"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                )}
+              </svg>
+            </button>
+
+            <button
+              onClick={() => handleSelectPackage("")}
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              Pesan Sekarang
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200 bg-white shadow-lg animate-mobile-menu">
+            <div className="px-4 py-3 space-y-1">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Beranda
+              </Link>
+              <Link
+                href="/paket-tour"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Paket Tour
+              </Link>
+              <Link
+                href="/blog"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Blog
+              </Link>
+              <Link
+                href="/ulasan"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Ulasan
+              </Link>
+              <Link
+                href="/#contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Kontak
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
@@ -110,18 +178,43 @@ export default function PaketTourPage() {
 
         {/* Packages Grid */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl font-black text-[#1A365D] tracking-tight">
-              Pilih Paket Unggulan Anda
+              Pilih Paket Wisata Anda
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-lg mx-auto">
-              Silakan pilih salah satu paket di bawah untuk mengaktifkan kalkulator instan dan formulir pemesanan otomatis.
+              Saring pilihan paket berdasarkan kelas hotel bintang pilihan Anda.
             </p>
           </div>
 
+          {/* Filter Hotel Bintang 3 / 4 */}
+          <div className="flex justify-center items-center gap-2 mb-12">
+            {[
+              { id: "all", label: "Semua Paket" },
+              { id: 3, label: "Hotel ⭐⭐⭐" },
+              { id: 4, label: "Hotel ⭐⭐⭐⭐" }
+            ].map((tab) => {
+              const isSelected = starFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setStarFilter(tab.id)}
+                  className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-full border transition-all active:scale-95 cursor-pointer
+                    ${isSelected 
+                      ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/15" 
+                      : "bg-white border-slate-200 text-slate-650 hover:bg-slate-50 hover:border-slate-300"
+                    }
+                  `}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {PACKAGES.map((pkg) => {
-              const isBestSeller = pkg.id === "batam-bintan-3d2n";
+            {filteredPackages.map((pkg) => {
+              const isBestSeller = pkg.id.includes("batam-bintan-3d2n") || pkg.id.includes("lengkap");
               return (
                 <div
                   key={pkg.id}

@@ -6,14 +6,14 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 async function run() {
-  console.log("Menghubungkan ke Supabase...");
+  console.log("Menghubungkan...");
   try {
     const { data, error } = await supabase
       .from('reviews')
       .select('*');
     
     if (error) {
-      console.error("Error dari Supabase:", error);
+      console.error("Error dari base:", error);
     } else {
       console.log("Jumlah reviews di database:", data.length);
       console.log("Data ulasan:", data);

@@ -55,6 +55,8 @@ export default function UlasanPage() {
     return matchesSearch && matchesRating;
   });
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
       {/* Header */}
@@ -74,16 +76,83 @@ export default function UlasanPage() {
               Fajri Transport Batam
             </span>
           </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 w-10 h-10 hover:bg-slate-50 transition-all shadow-sm active:scale-95 cursor-pointer"
-            title="Kembali ke Beranda"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Beranda</Link>
+            <Link href="/paket-tour" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Paket Tour</Link>
+            <Link href="/blog" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Blog</Link>
+            <Link href="/ulasan" className="text-sm font-bold text-blue-600 transition-colors">Ulasan</Link>
+            <Link href="/#contact" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Kontak</Link>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            {/* Hamburger Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+              aria-label="Menu Utama"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                )}
+              </svg>
+            </button>
+
+            <Link
+              href="/#booking-section"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              Book Now
+            </Link>
+          </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200 bg-white shadow-lg animate-mobile-menu">
+            <div className="px-4 py-3 space-y-1">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Beranda
+              </Link>
+              <Link
+                href="/paket-tour"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Paket Tour
+              </Link>
+              <Link
+                href="/blog"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Blog
+              </Link>
+              <Link
+                href="/ulasan"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Ulasan
+              </Link>
+              <Link
+                href="/#contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2.5 px-3 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 active:bg-blue-50/50 hover:text-blue-650 transition-all"
+              >
+                Kontak
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}

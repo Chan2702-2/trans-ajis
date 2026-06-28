@@ -1,66 +1,399 @@
 export const PACKAGES = [
+  // === PAKET BINTANG 3 ===
   {
-    id: "batam-bintan-3d2n",
-    nama: "1. Batam & Bintan 3D2N (Best Seller)",
-    harga_rm: 750,
+    id: "b3-3d2n-batam-1",
+    nama: "3D2N Batam (Bintang 3 - Paket A)",
+    harga_rm: 599,
     min_pax: 4,
-    image: "/beach_resort_bintan.jpg",
-    deskripsi_fasilitas: [
-      "Tiket Ferry PP (Singapore/Johor to Batam)",
-      "Tiket Ferry Domestik PP (Batam to Bintan)",
-      "Transportasi AC Private selama tour (Batam & Bintan)",
-      "Hotel Bintang 4 (2 Malam di Batam/Bintan + Sarapan)",
-      "Tiket Masuk ke Treasure Bay Bintan (Lagoi)",
-      "Kunjungan Gurun Pasir & Danau Biru Bintan",
-      "City Tour Batam (Jembatan Barelang, Welcome to Batam)",
-      "Pemandu Wisata Profesional & Berlisensi",
-      "2x Makan Siang Seafood di Restauran Kelong Premium",
-      "Air Mineral gratis selama perjalanan tour"
-    ],
-    aturan_bonus: {
-      jumlah_pax_min: 10,
-      free_pax: 1
-    }
-  },
-  {
-    id: "batam-2d1n",
-    nama: "2. Batam 2D1N Relaxing",
-    harga_rm: 499,
-    min_pax: 4,
-    image: "/batam_temple_landmark.jpg",
-    deskripsi_fasilitas: [
-      "Tiket Ferry PP (Singapore/Johor to Batam)",
-      "Transportasi AC Private selama tour di Batam",
-      "Hotel Bintang 3 (1 Malam + Sarapan Pagi)",
-      "City Tour Jembatan Barelang (Iconic Spot)",
-      "Kunjungan ke Masjid Cheng Ho & Miniatur Rumah Adat",
-      "Wisata Belanja di Mall Terbesar Batam (Grand Batam Mall)",
-      "Pemandu Wisata lokal ramah & berpengalaman",
-      "1x Makan Siang Seafood di Restaurant Kelong Lokal",
-      "Air Mineral & Snack Box saat kedatangan"
-    ],
-    aturan_bonus: {
-      jumlah_pax_min: 10,
-      free_pax: 1
-    }
-  },
-  {
-    id: "batam-3d2n-essential",
-    nama: "3. Batam 3D2N (Essential)",
-    harga_rm: 499,
-    min_pax: 4,
+    bintang: 3,
     image: "/batam_city_mall.jpg",
     deskripsi_fasilitas: [
-      "Tiket Ferry PP (Singapore/Johor/Batam)",
-      "Transportasi AC selama tour Batam",
-      "Hotel Bintang 3 (2 Malam + Sarapan)",
-      "Full Day Tour Batam & Shopping Tour",
-      "Makan Siang & Malam Seafood/Kuliner lokal",
-      "Dokumentasi foto/video gratis"
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (2 Malam)",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Puncak Beliung",
+      "Blue Fire / Pasir Pink",
+      "Jembatan Barelang",
+      "Mineral Water",
+      "Tour Guide & Driver"
     ],
     aturan_bonus: {
-      step: 10, // 10 pax = 1 free, 20 = 2 free, etc.
-      free_per_step: 1
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-3d2n-batam-bintan-2",
+    nama: "3D2N Batam & Bintan (Bintang 3 - Tanpa Makan)",
+    harga_rm: 570,
+    min_pax: 4,
+    bintang: 3,
+    image: "/beach_resort_bintan.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (2 Malam)",
+      "Tiket Ferry PP Batam - Bintan",
+      "Mineral Water",
+      "Tour Guide & Driver"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-3d2n-batam-bintan-3",
+    nama: "3D2N Batam & Bintan (Bintang 3 - Standard)",
+    harga_rm: 670,
+    min_pax: 4,
+    bintang: 3,
+    image: "/beach_resort_bintan.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (2 Malam)",
+      "Tiket Ferry PP Batam - Bintan",
+      "Mineral Water",
+      "Tour Guide & Driver",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Sarapan Hotel 2 kali"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-3d2n-batam-bintan-4",
+    nama: "3D2N Batam & Bintan (Bintang 3 - Lengkap)",
+    harga_rm: 710,
+    min_pax: 4,
+    bintang: 3,
+    image: "/beach_resort_bintan.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (2 Malam)",
+      "Tiket Ferry PP Batam - Bintan",
+      "Mineral Water",
+      "Tour Guide & Driver",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Sarapan Hotel 2 kali",
+      "Blue Fire / Pasir Pink, Puncak Beliung, Jembatan Barelang, Gurun Pasir / Telaga Biru, Pantai Lagoi Bay"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-3d2n-batam-5",
+    nama: "3D2N Batam (Bintang 3 - Simple)",
+    harga_rm: 450,
+    min_pax: 4,
+    bintang: 3,
+    image: "/batam_city_mall.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (2 Malam)",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-3d2n-batam-6",
+    nama: "3D2N Batam (Bintang 3 - Standard)",
+    harga_rm: 570,
+    min_pax: 4,
+    bintang: 3,
+    image: "/batam_city_mall.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (2 Malam)",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Sarapan 2 kali",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-2d1n-batam-7",
+    nama: "2D1N Batam (Bintang 3 - Simple)",
+    harga_rm: 370,
+    min_pax: 4,
+    bintang: 3,
+    image: "/batam_temple_landmark.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (1 Malam)",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-2d1n-batam-8",
+    nama: "2D1N Batam (Bintang 3 - Standard)",
+    harga_rm: 450,
+    min_pax: 4,
+    bintang: 3,
+    image: "/batam_temple_landmark.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (1 Malam)",
+      "Makan Malam 1 kali",
+      "Makan Siang 2 kali",
+      "Sarapan 1 kali",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b3-2d1n-batam-9",
+    nama: "2D1N Batam (Bintang 3 - Lengkap)",
+    harga_rm: 499,
+    min_pax: 4,
+    bintang: 3,
+    image: "/batam_temple_landmark.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐ (1 Malam)",
+      "Makan Malam 1 kali",
+      "Makan Siang 2 kali",
+      "Puncak Beliung",
+      "Blue Fire / Pasir Pink",
+      "Jembatan Barelang",
+      "Mineral Water",
+      "Tour Guide & Driver"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+
+  // === PAKET BINTANG 4 ===
+  {
+    id: "b4-2d1n-batam-1",
+    nama: "2D1N Batam (Bintang 4 - Simple)",
+    harga_rm: 470,
+    min_pax: 4,
+    bintang: 4,
+    image: "/batam_temple_landmark.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (1 Malam)",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-2d1n-batam-2",
+    nama: "2D1N Batam (Bintang 4 - Standard)",
+    harga_rm: 550,
+    min_pax: 4,
+    bintang: 4,
+    image: "/batam_temple_landmark.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (1 Malam)",
+      "Makan Malam 1 kali",
+      "Makan Siang 2 kali",
+      "Sarapan 1 kali",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-2d1n-batam-3",
+    nama: "2D1N Batam (Bintang 4 - Lengkap)",
+    harga_rm: 599,
+    min_pax: 4,
+    bintang: 4,
+    image: "/batam_temple_landmark.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (1 Malam)",
+      "Makan Malam 1 kali",
+      "Makan Siang 2 kali",
+      "Puncak Beliung",
+      "Blue Fire / Pasir Pink",
+      "Jembatan Barelang",
+      "Mineral Water",
+      "Tour Guide & Driver"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-3d2n-batam-4",
+    nama: "3D2N Batam (Bintang 4 - Simple)",
+    harga_rm: 550,
+    min_pax: 4,
+    bintang: 4,
+    image: "/batam_city_mall.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (2 Malam)",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-3d2n-batam-5",
+    nama: "3D2N Batam (Bintang 4 - Standard)",
+    harga_rm: 670,
+    min_pax: 4,
+    bintang: 4,
+    image: "/batam_city_mall.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (2 Malam)",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Sarapan 2 kali",
+      "Tour Guide & Driver",
+      "Mineral Water"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-3d2n-batam-6",
+    nama: "3D2N Batam (Bintang 4 - Lengkap)",
+    harga_rm: 699,
+    min_pax: 4,
+    bintang: 4,
+    image: "/batam_city_mall.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (2 Malam)",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Puncak Beliung",
+      "Blue Fire / Pasir Pink",
+      "Jembatan Barelang",
+      "Mineral Water",
+      "Tour Guide & Driver"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-3d2n-batam-bintan-7",
+    nama: "3D2N Batam & Bintan (Bintang 4 - Tanpa Makan)",
+    harga_rm: 670,
+    min_pax: 4,
+    bintang: 4,
+    image: "/beach_resort_bintan.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (2 Malam)",
+      "Tiket Ferry PP Batam - Bintan",
+      "Mineral Water",
+      "Tour Guide & Driver"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-3d2n-batam-bintan-8",
+    nama: "3D2N Batam & Bintan (Bintang 4 - Standard)",
+    harga_rm: 770,
+    min_pax: 4,
+    bintang: 4,
+    image: "/beach_resort_bintan.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (2 Malam)",
+      "Tiket Ferry PP Batam - Bintan",
+      "Mineral Water",
+      "Tour Guide & Driver",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Sarapan Hotel 2 kali"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
+    }
+  },
+  {
+    id: "b4-3d2n-batam-bintan-9",
+    nama: "3D2N Batam & Bintan (Bintang 4 - Lengkap)",
+    harga_rm: 810,
+    min_pax: 4,
+    bintang: 4,
+    image: "/beach_resort_bintan.jpg",
+    deskripsi_fasilitas: [
+      "Tiket Ferry Two Way + Tax",
+      "Transportasi AC Private",
+      "Hotel ⭐⭐⭐⭐ (2 Malam)",
+      "Tiket Ferry PP Batam - Bintan",
+      "Mineral Water",
+      "Tour Guide & Driver",
+      "Makan Malam 2 kali",
+      "Makan Siang 3 kali",
+      "Sarapan Hotel 2 kali",
+      "Blue Fire / Pasir Pink, Puncak Beliung, Jembatan Barelang, Gurun Pasir / Telaga Biru, Pantai Lagoi Bay"
+    ],
+    aturan_bonus: {
+      jumlah_pax_min: 10,
+      free_pax: 1
     }
   }
 ];
