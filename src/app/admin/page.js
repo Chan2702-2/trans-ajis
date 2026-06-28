@@ -23,9 +23,11 @@ export default function AdminPage() {
   const [isLoadingReviews, setIsLoadingReviews] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
-  const CORRECT_PASSCODE = "fajribtm123";
+  // Ganti otentikasi local dengan API Call
+  useEffect(() => {
+    checkAuthSession();
+  }, []);
 
-  // Fetch reviews from Supabase once authorized
   useEffect(() => {
     if (isAuthorized) {
       fetchReviews();
@@ -62,13 +64,49 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogin = (e) => {
+  const checkAuthSession = async () => {
+    try {
+      const res = await fetch("/api/admin/login");
+      const data = await res.json();
+      if (data.authorized) {
+        setIsAuthorized(true);
+      }
+    } catch (err) {
+      console.error("Gagal memeriksa sesi login:", err);
+    }
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (passcode === CORRECT_PASSCODE) {
-      setIsAuthorized(true);
-      setAuthError("");
-    } else {
-      setAuthError("Passcode salah! Silakan coba lagi.");
+    setAuthError("");
+    
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setIsAuthorized(true);
+        setAuthError("");
+      } else {
+        setAuthError(data.error || "Passcode salah! Silakan coba lagi.");
+      }
+    } catch (err) {
+      setAuthError("Gagal menghubungi server. Silakan coba lagi.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/login", { method: "DELETE" });
+      setIsAuthorized(false);
+      setPasscode("");
+    } catch (err) {
+      console.error("Gagal logout:", err);
     }
   };
 
@@ -280,7 +318,7 @@ export default function AdminPage() {
               </svg>
             </Link>
             <button
-              onClick={() => setIsAuthorized(false)}
+              onClick={handleLogout}
               className="inline-flex items-center justify-center rounded-xl bg-red-650 hover:bg-red-700 text-xs font-bold text-white px-4 py-2.5 transition-all shadow-md active:scale-95 cursor-pointer"
             >
               Log Out
