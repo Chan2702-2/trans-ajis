@@ -833,205 +833,103 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {/* Card 1: Batam & Bintan 3D2N */}
-            <div className="group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 reveal-on-scroll">
-              <div>
-                <div className="relative aspect-[16/7] w-full bg-slate-100 overflow-hidden">
-                  <Image
-                    src="/beach_resort_bintan.jpg"
-                    alt="Batam & Bintan Resort"
-                    fill
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
-                    Promo: 10 pax FREE 1 orang
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {(() => {
+              // 6 Paket spesifik yang diminta:
+              // Bintang 3:
+              // 1. 3D2N Batam (Bintang 3 Paket A) -> id: "b3-3d2n-batam-1"
+              // 2. 3D2N Batam & Bintan (Bintang 3 - Tanpa Makan) -> id: "b3-3d2n-batam-bintan-2"
+              // 3. 3D2N Batam & Bintan (Bintang 3 - Stander) -> id: "b3-3d2n-batam-bintan-3"
+              // Bintang 4:
+              // 4. 3D2N Batam (Bintang 4 Standart) -> id: "b4-3d2n-batam-5"
+              // 5. 3D2N Batam (Bintang 4 - Lengkap) -> id: "b4-3d2n-batam-6"
+              // 6. 3D2N Batam - Bintan (Bintang 3 - Standart) -> id: "b3-3d2n-batam-bintan-3" atau "b4-3d2n-batam-bintan-8" (b4 standard)
+              // User minta: "3. 3d2n batam - bintan (bintang 3 - standart)" untuk bintang 4 (b3-3d2n-batam-bintan-3) atau b4-3d2n-batam-bintan-8.
+              // Kami pilih b4-3d2n-batam-bintan-8 sebagai item bintang 4 ke-3 agar seimbang (3 paket Bintang 3 dan 3 paket Bintang 4).
+              const selectedIds = [
+                "b3-3d2n-batam-1",
+                "b3-3d2n-batam-bintan-2",
+                "b3-3d2n-batam-bintan-3",
+                "b4-3d2n-batam-5",
+                "b4-3d2n-batam-6",
+                "b4-3d2n-batam-bintan-8"
+              ];
+              
+              const homePackages = PACKAGES.filter(p => selectedIds.includes(p.id));
 
-                <div className="p-6">
-                  <div className="flex justify-between items-start gap-4 mb-4">
-                    <h3 className="text-lg font-bold text-[#1A365D]">
-                      1. Batam & Bintan 3D2N (Best Seller)
-                    </h3>
-                    <div className="text-right shrink-0">
-                      <span className="text-xs text-slate-500 block">Mulai dari</span>
-                      <span className="text-xl font-extrabold text-blue-600">RM 750</span>
-                      <span className="text-xs text-slate-500"> / pax</span>
-                      <span className="text-[10px] text-slate-400 block font-medium">(min 4 pax)</span>
+              return homePackages.map((pkg) => {
+                const isBestSeller = selectedIds.includes(pkg.id);
+                return (
+                  <div key={pkg.id} className={`group bg-white rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col justify-between hover:shadow-lg
+                    ${isBestSeller ? "border-amber-500 ring-2 ring-amber-500/10 shadow-md relative" : "border-slate-200/90 shadow-sm"}
+                  `}>
+                    <div>
+                      <div className="relative aspect-[16/9] w-full bg-slate-100 overflow-hidden">
+                        <Image
+                          src={pkg.image}
+                          alt={pkg.nama}
+                          fill
+                          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        />
+                        <div className="absolute top-4 left-4 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm z-10">
+                          Hotel ⭐{pkg.bintang === 3 ? "⭐⭐" : "⭐⭐⭐"}
+                        </div>
+                        {isBestSeller && (
+                          <div className="absolute top-4 right-4 bg-amber-500 text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md z-15">
+                            Best Seller
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="p-6">
+                        <div className="flex justify-between items-start gap-4 mb-4">
+                          <h3 className="text-sm font-extrabold text-[#1A365D] leading-snug">
+                            {pkg.nama}
+                          </h3>
+                          <div className="text-right shrink-0">
+                            <span className="text-[10px] text-slate-500 block">Mulai dari</span>
+                            <span className="text-lg font-black text-blue-600">RM {pkg.harga_rm}</span>
+                            <span className="text-[10px] text-slate-500"> / pax</span>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-slate-100 pt-4">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Fasilitas Termasuk:</p>
+                          <ul className="grid grid-cols-1 gap-y-1.5">
+                            {pkg.deskripsi_fasilitas.slice(0, 5).map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-xs text-slate-600">
+                                <svg className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                                <span className="truncate">{item}</span>
+                              </li>
+                            ))}
+                            {pkg.deskripsi_fasilitas.length > 5 && (
+                              <li className="text-[10px] text-blue-500 font-semibold pl-6">
+                                + {pkg.deskripsi_fasilitas.length - 5} fasilitas lainnya
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 pt-0 border-t border-slate-50 flex justify-between items-center bg-slate-50/50">
+                      <span className="text-[10px] text-slate-400 font-bold">Beli 10 Free 1</span>
+                      <button
+                        onClick={() => handleSelectPackage(pkg.id)}
+                        className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition-all active:scale-95 cursor-pointer"
+                        title="Pesan Paket Ini"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
-
-                  <div className="border-t border-slate-100 pt-4">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Fasilitas Termasuk (10 Poin):</p>
-                    <ul className="grid grid-cols-1 gap-y-2">
-                      {[
-                        "Tiket Ferry PP (Singapore/Johor to Batam)",
-                        "Tiket Ferry Domestik PP (Batam to Bintan)",
-                        "Transportasi AC Private selama tour (Batam & Bintan)",
-                        "Hotel Bintang 4 (2 Malam di Batam/Bintan + Sarapan)",
-                        "Tiket Masuk ke Treasure Bay Bintan (Lagoi)",
-                        "Kunjungan Gurun Pasir & Danau Biru Bintan",
-                        "City Tour Batam (Jembatan Barelang, Welcome to Batam)",
-                        "Pemandu Wisata Profesional & Berlisensi",
-                        "2x Makan Siang Seafood di Restauran Kelong Premium",
-                        "Air Mineral gratis selama perjalanan tour"
-                      ].map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-slate-605">
-                          <svg className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 pt-0 border-t border-slate-50 flex justify-end">
-                <button
-                  onClick={() => handleSelectPackage("batam-bintan-3d2n")}
-                  className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition-all active:scale-95"
-                  title="Pesan Paket Ini"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Card 2: Batam 2D1N */}
-            <div className="group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 reveal-on-scroll reveal-delay-100">
-              <div>
-                <div className="relative aspect-[16/7] w-full bg-slate-100 overflow-hidden">
-                  <Image
-                    src="/batam_temple_landmark.jpg"
-                    alt="Batam Temple Landmark"
-                    fill
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
-                    Promo: 10 pax FREE 1 orang
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex justify-between items-start gap-4 mb-4">
-                    <h3 className="text-lg font-bold text-[#1A365D]">
-                      2. Batam 2D1N
-                    </h3>
-                    <div className="text-right shrink-0">
-                      <span className="text-xs text-slate-500 block">Mulai dari</span>
-                      <span className="text-xl font-extrabold text-blue-600">RM 499</span>
-                      <span className="text-xs text-slate-500"> / pax</span>
-                      <span className="text-[10px] text-slate-400 block font-medium">(min 4 pax)</span>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-slate-100 pt-4">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Fasilitas Termasuk (9 Poin):</p>
-                    <ul className="grid grid-cols-1 gap-y-2">
-                      {[
-                        "Tiket Ferry PP (Singapore/Johor to Batam)",
-                        "Transportasi AC Private selama tour di Batam",
-                        "Hotel Bintang 3 (1 Malam + Sarapan Pagi)",
-                        "City Tour Jembatan Barelang (Iconic Spot)",
-                        "Kunjungan ke Masjid Cheng Ho & Miniatur Rumah Adat",
-                        "Wisata Belanja di Mall Terbesar Batam (Grand Batam Mall)",
-                        "Pemandu Wisata lokal ramah & berpengalaman",
-                        "1x Makan Siang Seafood di Restaurant Kelong Lokal",
-                        "Air Mineral & Snack Box saat kedatangan"
-                      ].map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-slate-600">
-                          <svg className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 pt-0 border-t border-slate-50 flex justify-end">
-                <button
-                  onClick={() => handleSelectPackage("batam-2d1n")}
-                  className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition-all active:scale-95"
-                  title="Pesan Paket Ini"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Card 3: Batam 3D2N (Essential) */}
-            <div className="group bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-lg transition-all duration-300 reveal-on-scroll reveal-delay-200">
-              <div>
-                <div className="relative aspect-[16/7] w-full bg-slate-100 overflow-hidden">
-                  <Image
-                    src="/batam_city_mall.jpg"
-                    alt="Batam Shopping Mall"
-                    fill
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
-                    Promo: Group Bonus 10+
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex justify-between items-start gap-4 mb-4">
-                    <h3 className="text-lg font-bold text-[#1A365D]">
-                      3. Batam 3D2N (Essential)
-                    </h3>
-                    <div className="text-right shrink-0">
-                      <span className="text-xs text-slate-500 block">Mulai dari</span>
-                      <span className="text-xl font-extrabold text-blue-600">RM 499</span>
-                      <span className="text-xs text-slate-500"> / pax</span>
-                      <span className="text-[10px] text-slate-400 block font-medium">(min 4 pax)</span>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-slate-100 pt-4">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Fasilitas Termasuk:</p>
-                    <ul className="grid grid-cols-1 gap-y-2">
-                      {[
-                        "Tiket Ferry PP (Singapore/Johor/Batam)",
-                        "Transportasi AC selama tour Batam",
-                        "Hotel Bintang 3 (2 Malam + Sarapan)",
-                        "Full Day Tour Batam & Shopping Tour",
-                        "Makan Siang & Malam Seafood/Kuliner lokal",
-                        "Dokumentasi foto/video gratis"
-                      ].map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-slate-600">
-                          <svg className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 pt-0 border-t border-slate-50 flex justify-end">
-                <button
-                  onClick={() => handleSelectPackage("batam-3d2n-essential")}
-                  className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md transition-all active:scale-95"
-                  title="Pesan Paket Ini"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </button>
-              </div>
-            </div>
+                );
+              });
+            })()}
           </div>
 
           {/* Button Lihat Semua Paket */}
@@ -1599,7 +1497,7 @@ export default function Home() {
             <span className="text-[10px] font-bold text-blue-900/60 uppercase tracking-widest">Fajri Ajis</span>
           </div>
           <p className="text-xs text-slate-750 leading-relaxed font-semibold italic">
-            "Ubah Paket 3 untuk menampilkan group bonus lengkap: 10+ (1 Free), 20+ (2 Free), 30+ (3 Free), dst."
+            "Bonus lengkap: 10+ (1 Free), 20+ (2 Free), 30+ (3 Free), dst."
           </p>
         </div>
       </div>
