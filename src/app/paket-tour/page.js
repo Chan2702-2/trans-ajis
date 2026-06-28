@@ -9,7 +9,6 @@ import BookingForm from "@/components/BookingForm";
 export default function PaketTourPage() {
   const [selectedPkgId, setSelectedPkgId] = useState("");
   const [activeFaq, setActiveFaq] = useState(null);
-  const [starFilter, setStarFilter] = useState("all"); // 'all' | 3 | 4
 
   const handleSelectPackage = (pkgId) => {
     setSelectedPkgId(pkgId);
@@ -19,15 +18,10 @@ export default function PaketTourPage() {
     }
   };
 
-  const filteredPackages = PACKAGES.filter((pkg) => {
-    if (starFilter === "all") return true;
-    return pkg.bintang === starFilter;
-  });
-
   const faqs = [
     {
       q: "Apakah paket tour sudah termasuk tiket ferry?",
-      a: "Ya! Seluruh paket tour kami sudah termasuk tiket ferry pulang-pergi (PP) dari Singapura (HarbourFront) atau Malaysia (Johor Bahru) ke Batam, lengkap dengan pengurusan boarding."
+      a: "Ya! Seluruh paket tour kami (Paket 1, 2, dan 3) sudah termasuk tiket ferry pulang-pergi (PP) dari Singapura (HarbourFront) atau Malaysia (Johor Bahru) ke Batam, lengkap dengan pengurusan boarding."
     },
     {
       q: "Apakah jadwal/itinerary tour bisa dicustom?",
@@ -39,7 +33,7 @@ export default function PaketTourPage() {
     },
     {
       q: "Apakah ada diskon atau bonus untuk rombongan?",
-      a: "Ya! Kami memiliki promo khusus rombongan. Setiap pembelian minimal 10 pax akan mendapatkan gratis 1 pax (FREE 1). Untuk Paket tertentu berlaku kelipatan bonus setiap 10 pax (10+1 free, 20+2 free, dst)."
+      a: "Ya! Kami memiliki promo khusus rombongan. Untuk Paket 1 dan 2, setiap pembelian minimal 10 pax akan mendapatkan gratis 1 pax (FREE 1). Untuk Paket 3, berlaku kelipatan bonus setiap 10 pax (10+1 free, 20+2 free, dst)."
     },
     {
       q: "Apakah armada transportasi yang digunakan bersifat pribadi?",
@@ -107,7 +101,7 @@ export default function PaketTourPage() {
               onClick={() => handleSelectPackage("")}
               className="inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-sm font-bold text-white px-5 py-2.5 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
-              Pesan Sekarang
+              Book Now
             </button>
           </div>
         </div>
@@ -178,43 +172,18 @@ export default function PaketTourPage() {
 
         {/* Packages Grid */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-8">
+          <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-black text-[#1A365D] tracking-tight">
-              Pilih Paket Wisata Anda
+              Pilih Paket Unggulan Anda
             </h2>
             <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-lg mx-auto">
-              Saring pilihan paket berdasarkan kelas hotel bintang pilihan Anda.
+              Silakan pilih salah satu paket di bawah untuk mengaktifkan kalkulator instan dan formulir pemesanan otomatis.
             </p>
           </div>
 
-          {/* Filter Hotel Bintang 3 / 4 */}
-          <div className="flex justify-center items-center gap-2 mb-12">
-            {[
-              { id: "all", label: "Semua Paket" },
-              { id: 3, label: "Hotel ⭐⭐⭐" },
-              { id: 4, label: "Hotel ⭐⭐⭐⭐" }
-            ].map((tab) => {
-              const isSelected = starFilter === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setStarFilter(tab.id)}
-                  className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-full border transition-all active:scale-95 cursor-pointer
-                    ${isSelected 
-                      ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/15" 
-                      : "bg-white border-slate-200 text-slate-650 hover:bg-slate-50 hover:border-slate-300"
-                    }
-                  `}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {filteredPackages.map((pkg) => {
-              const isBestSeller = pkg.id.includes("batam-bintan-3d2n") || pkg.id.includes("lengkap");
+            {PACKAGES.map((pkg) => {
+              const isBestSeller = pkg.id === "batam-bintan-3d2n";
               return (
                 <div
                   key={pkg.id}
